@@ -1,0 +1,178 @@
+
+!
+! Last configuration change at 16:02:16 UTC Sat Oct 4 2014
+enable
+configure terminal
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging monitor
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+ip cef load-sharing algorithm include-ports source destination
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 97B6YBUT01O
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.13 255.255.255.255
+ ipv6 address 2001:122:1:1::13/128
+!
+interface GigabitEthernet1
+ no shutdown
+
+ 
+!
+interface GigabitEthernet1.123
+ encapsulation dot1Q 123
+ ip address 10.1.123.13 255.255.255.0
+ ipv6 address 2001:10:1:123::13/64
+!
+interface GigabitEthernet1.1314
+ encapsulation dot1Q 1314
+ ip address 54.251.1.13 255.255.255.240
+ ipv6 address 2001:54:251:1::13/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ 
+!
+router bgp 200
+ bgp log-neighbor-changes
+ bgp listen range 10.1.123.0/24 peer-group AS_200
+ no bgp default ipv4-unicast
+ neighbor AS_200 peer-group
+ neighbor AS_200 remote-as 200
+ neighbor 2001:10:1:123::11 remote-as 200
+ neighbor 2001:10:1:123::12 remote-as 200
+ neighbor 2001:54:251:1::14 remote-as 555
+ neighbor 54.251.1.14 remote-as 555
+ !
+ address-family ipv4
+  network 54.251.1.0 mask 255.255.255.240
+  network 122.1.1.13 mask 255.255.255.255
+  aggregate-address 122.0.0.0 255.0.0.0 summary-only
+  aggregate-address 60.7.7.0 255.255.255.128 as-set summary-only
+  aggregate-address 30.9.0.0 255.255.0.0 as-set summary-only attribute-map STRIP_OFF_COMMUNITIES
+  neighbor AS_200 activate
+  neighbor AS_200 send-community both
+  neighbor AS_200 route-reflector-client
+  neighbor 54.251.1.14 activate
+  neighbor 54.251.1.14 send-community both
+  maximum-paths eibgp 2
+  distance bgp 20 200 255
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:122:1:1::13/128
+  neighbor 2001:10:1:123::11 activate
+  neighbor 2001:10:1:123::11 route-reflector-client
+  neighbor 2001:10:1:123::11 next-hop-self
+  neighbor 2001:10:1:123::12 activate
+  neighbor 2001:10:1:123::12 route-reflector-client
+  neighbor 2001:10:1:123::12 next-hop-self
+  neighbor 2001:54:251:1::14 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map STRIP_OFF_COMMUNITIES permit 10
+ set community none
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

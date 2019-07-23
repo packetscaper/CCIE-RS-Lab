@@ -1,0 +1,37 @@
+---
+  
+  id : 10 
+
+  interface : Ethernet0/0
+  
+  subinterfaces:
+
+      - subint : 108 
+        des: connected to R8 
+        area: 3 
+
+      - subint : 10 
+        des : connected to R10
+        area : 3
+
+
+
+  AS : 54
+
+
+  BGP : 
+
+   neighbors:
+
+     - neighbor  : 155.1.0.2
+       AS        : 100
+
+     - neighbor : 155.1.108.8
+       AS       : 200
+
+     - neighbor : 155.1.109.9
+       AS       : 54
+
+
+
+

@@ -1,0 +1,167 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:45:16 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+ip domain name lab.lab
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+crypto key generate rsa modulus 1024
+ip ssh version 2
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain HSRP_KEY
+ key 0
+   key-string cisco1
+!
+!
+license udi pid CSR1000V sn 9CV7ZTTD0F1
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.14 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:10:255:255::14/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.100
+ encapsulation dot1Q 100
+ ip address 172.29.100.14 255.255.255.0
+ ip pim sparse-mode
+ standby 100 ip 172.29.100.254
+ standby 100 ip 172.29.100.253 secondary
+ standby 100 priority 120
+ standby 100 authentication md5 key-chain HSRP_KEY
+ ip igmp join-group 224.1.2.3
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf 1 area 0
+ ipv6 address 2001:172:29:100::14/64
+!
+interface GigabitEthernet1.145
+ encapsulation dot1Q 145
+ ip address 172.29.145.14 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 address 2001:172:29:145::14/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ neighbor 172.29.100.15
+ neighbor 172.29.100.13
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip mroute 0.0.0.0 0.0.0.0 172.29.100.15
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+ntp authentication-key 123 md5 11272D353C4132 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp server 10.255.255.13 key 123
+!
+end

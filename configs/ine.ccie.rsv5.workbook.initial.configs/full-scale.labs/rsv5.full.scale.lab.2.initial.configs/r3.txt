@@ -1,0 +1,158 @@
+enable
+configure terminal
+
+
+! Current configuration : 2075 bytes
+!
+! Last configuration change at 17:58:51 UTC Wed Oct 8 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9MALPY1LQP1
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.3 255.255.255.255
+ ipv6 address 2001:10:255:255::3/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.255.7.2 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.30
+ encapsulation dot1Q 30
+ ip address 169.254.30.0 255.255.255.254
+ ipv6 address 2001:169:254:30::/127
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.255.9.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.255.11.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:30::1 remote-as 10000
+ neighbor 169.254.30.1 remote-as 10000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 169.254.30.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:169:254:30::1 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R3#

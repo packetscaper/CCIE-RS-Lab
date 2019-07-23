@@ -1,0 +1,212 @@
+!
+version 15.2
+!
+!
+enable
+conf t
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 28.119.16.1 255.255.255.0
+ ipv6 address 2001:28:119:16::1/64
+ ipv6 address 2001:150:10:10::10/128
+!
+interface Loopback1
+ ip address 28.119.17.1 255.255.255.0
+ ipv6 address 2001:28:119:17::1/64
+!
+interface Loopback10
+ ip address 30.0.0.1 255.255.0.0
+ ipv6 address 2001:30::1/64
+!
+interface Loopback11
+ ip address 30.1.0.1 255.255.0.0
+ ipv6 address 2001:30:1::1/64
+!
+interface Loopback12
+ ip address 30.2.0.1 255.255.0.0
+ ipv6 address 2001:30:2::1/64
+!
+interface Loopback13
+ ip address 30.3.0.1 255.255.0.0
+ ipv6 address 2001:30:3::1/64
+!
+interface Loopback14
+ ip address 31.0.0.1 255.255.0.0
+ ipv6 address 2001:31::1/64
+!
+interface Loopback15
+ ip address 31.1.0.1 255.255.0.0
+ ipv6 address 2001:31:1::1/64
+!
+interface Loopback16
+ ip address 31.2.0.1 255.255.0.0
+ ipv6 address 2001:31:2::1/64
+!
+interface Loopback17
+ ip address 31.3.0.1 255.255.0.0
+ ipv6 address 2001:31:3::1/64
+!
+interface GigabitEthernet1
+no ip address
+no shutdown
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet1.10
+ encapsulation dot1Q 10
+ ip address 155.1.10.10 255.255.255.0
+ ipv6 address 2001:155:1:10::10/64
+!
+interface GigabitEthernet1.108
+ encapsulation dot1Q 108
+ ip address 155.1.108.10 255.255.255.0
+ ipv6 address 2001:155:1:108::10/64
+!
+interface GigabitEthernet1.109
+ encapsulation dot1Q 109
+ ip address 155.1.109.10 255.255.255.0
+ ipv6 address 2001:155:1:109::10/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 54
+ bgp log-neighbor-changes
+ neighbor 155.1.108.8 remote-as 100
+ neighbor 155.1.109.9 remote-as 54
+ !
+ address-family ipv4
+  network 28.119.16.0 mask 255.255.255.0
+  network 28.119.17.0 mask 255.255.255.0
+  neighbor 155.1.108.8 activate
+  neighbor 155.1.108.8 send-community
+  neighbor 155.1.108.8 route-map BGP_IN in
+  neighbor 155.1.108.8 route-map BGP_OUT out
+  neighbor 155.1.109.9 activate
+  neighbor 155.1.109.9 next-hop-self
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route 155.1.79.0 255.255.255.0 155.1.109.9
+!
+!
+ip prefix-list BGP_PREPEND_1 seq 5 permit 112.0.0.0/8
+ip prefix-list BGP_PREPEND_1 seq 10 permit 113.0.0.0/8
+!
+ip prefix-list DEFAULT seq 5 permit 0.0.0.0/0
+!
+ip prefix-list DENY_DEFAULT seq 5 deny 0.0.0.0/0
+ip prefix-list DENY_DEFAULT seq 10 permit 0.0.0.0/0 le 32
+!
+route-map BGP_IN deny 10
+ match ip address prefix-list DEFAULT
+!
+route-map BGP_IN permit 1000
+!
+route-map BGP_OUT permit 10
+ match ip address prefix-list BGP_PREPEND_1
+ set as-path prepend 50 60
+!
+route-map BGP_OUT permit 10000
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+!
+!
+end
+!
+end

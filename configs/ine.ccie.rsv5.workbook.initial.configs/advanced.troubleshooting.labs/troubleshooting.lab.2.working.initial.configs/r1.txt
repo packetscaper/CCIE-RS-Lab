@@ -1,0 +1,345 @@
+
+!
+! Last configuration change at 23:49:04 UTC Tue Oct 7 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging discriminator a facility drops NHRP|QOS|Priority 
+no logging console
+enable secret 5 $1$YeQ2$I4qeist9jzw7KzVSv1R1F.
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 92HVO0PSL3U
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+class-map match-all Europe_voice
+ match access-group 100
+class-map match-all Europe_Routing
+ match ip precedence 6 
+class-map match-all Tokyo_Routing
+ match ip precedence 6 
+class-map match-all Tokyo_voice
+ match access-group 100
+!
+policy-map Europe
+ class Europe_voice
+  priority 1000
+ class Europe_Routing
+  bandwidth percent 20 
+policy-map Europe_parent
+ class class-default
+  shape average 3000000
+   service-policy Europe
+policy-map Tokyo
+ class Tokyo_voice
+  priority percent 20
+ class Tokyo_Routing
+  bandwidth percent 10 
+policy-map Tokyo_parent
+ class class-default
+  shape average 2000000
+   service-policy Tokyo
+!
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+crypto isakmp key CORP_KEY address 44.2.5.5       
+crypto isakmp key CORP_KEY address 44.2.5.7       
+crypto isakmp key CORP_KEY address 44.2.5.9       
+crypto isakmp key CORP_KEY address 44.2.5.11      
+crypto isakmp key CORP_KEY address 44.2.5.13      
+crypto isakmp key CORP_KEY address 44.2.5.1       
+crypto isakmp key CORP_KEY address 44.2.5.3       
+crypto isakmp key CORP_KEY address 44.6.6.6       
+!
+!
+crypto ipsec transform-set CORP_TRANS esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile CORP_PROFILE
+ set transform-set CORP_TRANS 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.1 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 224.100.1.1
+ ip ospf 1 area 0
+ ipv6 address 2001:172:16:1::1/128
+ ospfv3 1 ipv6 area 0
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::1/128
+!
+interface Tunnel0
+ bandwidth 1000000
+ ip address 180.10.254.1 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication CORPPASS
+ ip nhrp map multicast dynamic
+ ip nhrp map group Tokyo service-policy output Tokyo_parent
+ ip nhrp map group Europe service-policy output Europe_parent
+ ip nhrp network-id 1
+ ip nhrp holdtime 300
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ delay 10
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001:180:10:254::1/64
+ ipv6 mtu 1400
+ ipv6 nhrp authentication CORPv6
+ ipv6 nhrp map multicast dynamic
+ ipv6 nhrp network-id 1
+ tunnel source GigabitEthernet1.110
+ tunnel mode gre multipoint
+ tunnel key 150
+ tunnel protection ipsec profile CORP_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 180.10.12.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf multi-area 0
+ ip ospf 1 area 20
+ ipv6 address 2001:180:10:12::1/64
+ ipv6 mtu 1500
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 20
+ ospfv3 1 ipv6 multi-area 0
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 180.10.13.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 0
+ ipv6 address 2001:180:10:13::1/64
+ ospfv3 1 ipv6 area 0
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ ip address 44.2.5.1 255.255.255.254
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+ ipv6 address 2001:44:2:5::1/127
+!
+interface GigabitEthernet1.114
+ encapsulation dot1Q 114
+ ip address 180.10.114.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network broadcast
+ ip ospf 1 area 51
+ ipv6 address 2001:180:10:114::1/64
+ ospfv3 1 ipv6 area 51
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 180.10.116.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 1 area 20
+ ipv6 address 2001:180:10:116::1/64
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 20
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface Tunnel0
+   no next-hop-self no-ecmp-mode
+   add-path 2
+   no split-horizon
+   summary-address 0.0.0.0 0.0.0.0 leak-map leak
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 180.10.254.0 0.0.0.255
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 56
+  !
+  af-interface default
+   shutdown
+  exit-af-interface
+  !
+  af-interface Tunnel0
+   no shutdown
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  af-interface Loopback0
+   no shutdown
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 1 route-map permit-out
+  exit-af-topology
+ exit-address-family
+!
+router ospfv3 1
+ !
+ address-family ipv6 unicast
+  redistribute eigrp 56 tag 56 include-connected
+  area 51 nssa no-redistribution no-summary
+ exit-address-family
+!
+router ospf 1
+ ispf
+ auto-cost reference-bandwidth 100000
+ area 51 nssa no-redistribution no-summary
+ summary-address 180.10.0.0 255.255.0.0 tag 1110
+ redistribute eigrp 56 metric 100 metric-type 1 subnets tag 56
+ default-information originate
+!
+router bgp 6618605
+ bgp log-neighbor-changes
+ neighbor 2001:172:16:1::16 remote-as 6618605
+ neighbor 2001:172:16:1::16 password CC1E_PASS
+ neighbor 2001:172:16:1::16 update-source Loopback0
+ neighbor 44.2.5.0 remote-as 101
+ !
+ address-family ipv4
+  no neighbor 2001:172:16:1::16 activate
+  neighbor 44.2.5.0 activate
+  neighbor 44.2.5.0 send-community
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:192:168:1::1/128
+  neighbor 2001:172:16:1::16 activate
+  neighbor 2001:172:16:1::16 send-community both
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip pim rp-address 172.16.1.16
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list corp-loopbacks seq 5 permit 172.16.1.0/24 le 32
+!
+ip prefix-list server-subnets seq 5 permit 180.10.123.0/24 le 32
+ip prefix-list server-subnets seq 10 permit 180.10.153.0/24 le 32
+access-list 100 permit udp any any range 16384 32767
+!
+!
+ipv6 prefix-list permit-out seq 5 permit 2001:172:16:1::3/128
+ipv6 prefix-list permit-out seq 10 permit 2001:172:16:1::4/128
+ipv6 prefix-list permit-out seq 15 permit 2001:172:16:1::5/128
+route-map leak permit 20
+ match ip address prefix-list server-subnets
+!
+route-map permit-out permit 10
+ match ipv6 address prefix-list permit-out
+ set metric 100000 100 255 1 1500
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

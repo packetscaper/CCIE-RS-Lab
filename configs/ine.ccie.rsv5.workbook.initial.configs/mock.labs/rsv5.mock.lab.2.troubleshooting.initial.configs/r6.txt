@@ -1,0 +1,242 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain OSPF_KEYS
+ key 1
+   key-string CISCO
+   cryptographic-algorithm hmac-sha-512
+!
+!
+license udi pid CSR1000V sn 95OSJ0DCRXR
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.6 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 226.6.6.6 source 10.255.255.100
+ ipv6 address 2001:10:255:255::6/128
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.26
+ encapsulation dot1Q 26
+ ip address 10.255.8.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.255.11.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.255.10.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 169.254.60.0 255.255.255.254
+ ipv6 address 2001:169:254:60::/127
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospfv3 1
+ prefix-suppression
+ bfd all-interfaces
+ auto-cost reference-bandwidth 1000000
+ !
+ address-family ipv4 unicast
+  passive-interface Loopback0
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  passive-interface Loopback0
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:60::1 remote-as 30000
+ neighbor 169.254.60.1 remote-as 30000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 next-hop-self
+  neighbor 169.254.60.1 activate
+  neighbor 169.254.60.1 route-map rm1 in
+  neighbor 169.254.60.1 route-map rm out
+ exit-address-family
+ !
+ address-family ipv6
+  bgp redistribute-internal
+  network 2001:10:255:255::6/128
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:10:255:255::4 route-map ip out
+  neighbor 2001:169:254:60::1 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip pim ssm range 5
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list 18 seq 5 permit 10.255.255.18/32
+!
+ip prefix-list 20 seq 5 permit 20.0.0.0/6
+access-list 5 permit 226.6.6.6
+!
+route-map ip permit 10
+ set local-preference 101
+!
+route-map rm deny 10
+ match ip address prefix-list 20
+!
+route-map rm permit 20
+!
+route-map rm1 deny 10
+ match ip address prefix-list 18
+!
+route-map rm1 permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

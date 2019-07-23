@@ -1,0 +1,172 @@
+
+!
+! Last configuration change at 03:16:29 UTC Tue Dec 16 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition HOUSTON
+ rd 150.1.15.15:1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+vrf definition RED
+ rd 150.1.15.15:100
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9FSD6IRBA2E
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 150.1.15.15 255.255.255.255
+ ipv6 address 2001::15/128
+! 
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.150
+ encapsulation dot1Q 150
+ ip address 169.254.150.1 255.255.255.252
+ ipv6 address 2001:169:254:150::1/126
+!
+interface GigabitEthernet1.215
+ encapsulation dot1Q 215
+ vrf forwarding RED
+ ip address 172.31.215.15 255.255.255.128
+ ipv6 address 2001:172:31:215::15/64
+!
+interface GigabitEthernet1.815
+ encapsulation dot1Q 815
+ vrf forwarding RED
+ ip address 172.31.158.15 255.255.255.128
+ ipv6 address 2001:172:31:158::15/64
+!
+interface GigabitEthernet1.315
+ encapsulation dot1Q 315
+ vrf forwarding HOUSTON
+ ip address 119.3.153.15 255.255.255.0
+ ipv6 address 2001:119:3:153::15/64
+!
+interface GigabitEthernet1.1315
+ encapsulation dot1Q 1315
+ ip address 10.254.255.11 255.255.255.254
+ ipv6 address 2001:10:254:255::B/127
+!
+interface GigabitEthernet1.1415
+ encapsulation dot1Q 1415
+ ip address 10.254.255.13 255.255.255.254
+ ipv6 address 2001:10:254:255::D/127
+!
+interface GigabitEthernet2
+ description MGMT INTERFACE - DO NOT CHANGE
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ ip address 192.168.1.15 255.255.255.0
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

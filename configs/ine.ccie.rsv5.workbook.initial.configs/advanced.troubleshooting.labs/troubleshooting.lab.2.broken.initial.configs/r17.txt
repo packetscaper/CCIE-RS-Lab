@@ -1,0 +1,228 @@
+
+!
+! Last configuration change at 01:32:03 UTC Sun Aug 10 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Colo-Site
+ rd 65000:65001
+ route-target export 65000:65000
+ route-target import 65000:65000
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteB
+ rd 65000:65000
+ route-target export 65000:65000
+ route-target import 65000:65000
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging console
+enable secret 5 $1$sN9T$kLfWQEY6SLFNWsPU/i5Hd0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls traffic-eng tunnels
+mpls traffic-eng auto-tunnel backup
+mpls traffic-eng auto-tunnel primary onehop
+mpls traffic-eng auto-tunnel primary config mpls ip
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Null0
+ no ip unreachables
+!
+interface Loopback0
+ description SP_A Loopback
+ ip address 199.8.2.100 255.255.255.255
+ ip ospf 65000 area 0
+ ipv6 address 2001:199:8:2::100/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.917
+ encapsulation dot1Q 917
+ vrf forwarding Colo-Site
+ ip address 180.10.179.1 255.255.255.254
+ ipv6 address 2001:180:10:179::1/127
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip address 199.8.2.17 255.255.255.252
+ ip ospf network point-to-point
+ ip ospf 65000 area 0
+ ipv6 address 2001:199:8:2::1/126
+ mpls ip
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ vrf forwarding SiteB
+ ip address 180.10.197.0 255.255.255.254
+ ipv6 address 2001:180:10:197::/127
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast vrf SiteB autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65000 metric 1000000 100000 255 1 1500
+  exit-af-topology
+  network 180.10.0.0
+ exit-address-family
+!
+router ospf 65000
+ router-id 199.8.2.100
+ mpls traffic-eng router-id Loopback0
+ mpls traffic-eng area 0
+!
+router bgp 65000
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 199.8.2.200 remote-as 65000
+ neighbor 199.8.2.200 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 199.8.2.200 activate
+  neighbor 199.8.2.200 send-community extended
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 199.8.2.200 activate
+  neighbor 199.8.2.200 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.179.0 remote-as 65003
+  neighbor 180.10.179.0 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteB
+  redistribute eigrp 56
+ exit-address-family
+ !
+ address-family ipv6 vrf SiteB
+  redistribute connected
+  neighbor 2001:180:10:197::1 remote-as 65002
+  neighbor 2001:180:10:197::1 activate
+  neighbor 2001:180:10:197::1 default-originate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route vrf Colo-Site 180.10.200.100 255.255.255.255 Null0
+!
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

@@ -1,0 +1,133 @@
+
+!
+! Last configuration change at 00:01:57 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console virtual
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9O1KOE672K8
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.8 255.255.255.255
+ ipv6 address 2001:122:1:1::8/128
+!
+interface GigabitEthernet1
+ no shutdown
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet1.68
+ encapsulation dot1Q 68
+ ip unnumbered Loopback0
+!
+interface GigabitEthernet1.89
+ encapsulation dot1Q 89
+ ip unnumbered Loopback0
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ speed 1000
+ no negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ login
+!
+!
+end

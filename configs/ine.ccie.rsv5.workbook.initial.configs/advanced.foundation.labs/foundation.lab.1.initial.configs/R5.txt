@@ -1,0 +1,23 @@
+hostname R5
+!
+no ip domain lookup
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ip address 5.5.5.5 255.255.255.255
+ ipv6 address 2001:5:5:5::5/128
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.1.56.5 255.255.255.0
+ ipv6 address 2001:10:1:56::5/64
+interface GigabitEthernet1.57
+ encapsulation dot1Q 57
+ ip address 10.1.57.5 255.255.255.0
+ ipv6 address 2001:10:1:57::5/64
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 100.1.35.5 255.255.255.0
+ ipv6 address 2001:100:1:35::5/64
+!
+end

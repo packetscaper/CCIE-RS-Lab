@@ -1,0 +1,136 @@
+
+!
+! Last configuration change at 04:00:52 UTC Fri Nov 7 2014
+enable
+conf t
+
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9DMEUSB233Y
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.255
+ ipv6 address 2001:2:2:2::2/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 156.1.24.2 255.255.255.0
+ ipv6 address 2001:156:1:24::2/64
+!
+interface GigabitEthernet1.222
+ encapsulation dot1Q 222
+ ip address 156.1.222.2 255.255.255.0
+ ipv6 address 2001:156:1:222::2/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ ip address 192.168.1.2 255.255.255.0
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

@@ -1,0 +1,22 @@
+hostname SW2
+!
+no ip domain-lookup
+!
+interface Loopback0
+ ip address 22.22.22.22 255.255.255.255
+ ipv6 address 2001:22:22:22::22/128
+!
+interface Vlan122
+ ip address 10.1.122.22 255.255.255.0
+ ipv6 address 2001:10:1:122::22/64
+!
+interface Vlan222
+ ip address 10.1.222.22 255.255.255.0
+ ipv6 address 2001:10:1:222::22/64
+!
+interface Vlan22
+ ip address 10.1.22.22 255.255.255.0
+ ipv6 address 2001:10:1:22::22/64
+!
+end
+

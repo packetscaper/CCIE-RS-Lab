@@ -1,0 +1,14 @@
+hostname SW4
+!
+no ip domain-lookup
+!
+interface Loopback0
+ ip address 24.24.24.24 255.255.255.255
+ ipv6 address 2001:24:24:24::24/128
+!
+interface Vlan124
+ ip address 10.1.124.24 255.255.255.0
+ ipv6 address 2001:10:1:124::24/64
+!
+end
+

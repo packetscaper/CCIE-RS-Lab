@@ -1,0 +1,192 @@
+enable
+configure terminal
+
+
+! Current configuration : 2808 bytes
+!
+! Last configuration change at 17:58:51 UTC Wed Oct 8 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition SITE_A
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9DMEUSB233Y
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.2 255.255.255.255
+ ipv6 address 2001:10:255:255::2/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.255.0.2 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.20
+ encapsulation dot1Q 20
+ ip address 169.254.20.0 255.255.255.254
+ ipv6 address 2001:169:254:20::/127
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.255.7.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 10.255.4.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.25
+ encapsulation dot1Q 25
+ ip address 10.255.5.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.26
+ encapsulation dot1Q 26
+ ip address 10.255.8.1 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.28
+ encapsulation dot1Q 28
+ vrf forwarding SITE_A
+ ip address 172.31.28.2 255.255.255.0
+ ipv6 address 2001:172:31:28::2/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:20::1 remote-as 10000
+ neighbor 169.254.20.1 remote-as 10000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 169.254.20.1 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:169:254:20::1 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R2#

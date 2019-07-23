@@ -1,0 +1,254 @@
+
+!
+! Last configuration change at 01:32:03 UTC Sun Aug 10 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+enable secret 5 $1$uXSY$XgQKPEujJobKY8Wla82Qn/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+crypto isakmp key CORP_KEY address 44.2.5.1       
+crypto isakmp key CORP_KEY address 44.2.5.3       
+crypto isakmp key CORP_KEY address 44.2.5.5       
+crypto isakmp key CORP_KEY address 44.2.5.7       
+crypto isakmp key CORP_KEY address 44.2.5.9       
+crypto isakmp key CORP_KEY address 44.2.5.11      
+crypto isakmp key CORP_KEY address 44.2.5.13      
+!
+!
+crypto ipsec transform-set CORP_TRANS esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile CORP_PROFILE
+ set transform-set CORP_TRANS 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.12 255.255.255.255
+ ipv6 address 2001:172:16:1::12/128
+!
+interface Tunnel0
+ bandwidth 1000000
+ ip address 180.10.254.12 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication CORPPASS
+ ip nhrp group Tokyo
+ ip nhrp network-id 1
+ ip nhrp holdtime 300
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ delay 10
+ ipv6 address FE80::12 link-local
+ ipv6 address 2001:180:10:254::12/64
+ ipv6 mtu 1400
+ ipv6 nhrp authentication CORPv6
+ ipv6 nhrp map 2001:180:10:254::1/128 44.2.5.1
+ ipv6 nhrp map 2001:180:10:254::2/128 44.2.5.3
+ ipv6 nhrp map multicast 44.2.5.1
+ ipv6 nhrp map multicast 44.2.5.3
+ ipv6 nhrp network-id 1
+ ipv6 nhrp holdtime 60
+ ipv6 nhrp nhs 2001:180:10:254::1
+ ipv6 nhrp nhs 2001:180:10:254::2
+ ipv6 nhrp registration timeout 30
+ tunnel source GigabitEthernet1.1012
+ tunnel mode gre multipoint
+ tunnel key 150
+ tunnel protection ipsec profile CORP_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.1012
+ encapsulation dot1Q 1012
+ ip address 44.2.5.9 255.255.255.254
+ ipv6 address 2001:44:2:5::9/127
+!
+interface GigabitEthernet1.1112
+ encapsulation dot1Q 1112
+ ip address 180.10.121.1 255.255.255.254
+ ipv6 address 2001:180:10:121::1/127
+!
+interface GigabitEthernet1.1210
+ encapsulation dot1Q 1210
+ ip address 180.10.120.12 255.255.255.0
+ ipv6 address 2001:180:10:120::12/64
+ ipv6 rip TOKYOv6 enable
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute rip metric 1000000 100000 255 1 1500
+  exit-af-topology
+  network 180.10.254.0 0.0.0.255
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 56
+  !
+  af-interface GigabitEthernet1.1012
+   shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.1112
+   shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.1210
+   shutdown
+  exit-af-interface
+  !
+  topology base
+   redistribute rip TOKYOv6 metric 1000000 100 255 1 1500 include-connected
+  exit-af-topology
+ exit-address-family
+!
+router rip
+ version 2
+ network 180.10.0.0
+ default-information originate
+ no auto-summary
+!
+router bgp 65003
+ bgp log-neighbor-changes
+ neighbor 44.2.5.8 remote-as 101
+ neighbor 180.10.121.0 remote-as 65001
+ neighbor 180.10.121.0 ttl-security hops 1
+ !
+ address-family ipv4
+  network 172.16.1.12 mask 255.255.255.255
+  redistribute rip metric 1
+  neighbor 44.2.5.8 activate
+  neighbor 44.2.5.8 send-community
+  neighbor 44.2.5.8 route-map NO_EXPORT_FROM_INTERNET in
+  neighbor 44.2.5.8 route-map NO_CORP_ROUTES_TO_INTERNET out
+  neighbor 180.10.121.0 activate
+ exit-address-family
+ !
+ address-family ipv6
+  redistribute rip TOKYOv6 include-connected
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 router rip TOKYOv6
+ redistribute eigrp 56 metric 2 include-connected
+!
+!
+route-map NO_CORP_ROUTES_TO_INTERNET deny 10
+!
+route-map NO_EXPORT_FROM_INTERNET permit 10
+ set community no-export
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

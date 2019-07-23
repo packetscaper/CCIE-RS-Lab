@@ -1,0 +1,271 @@
+!
+version 15.2
+!
+enable
+conf t
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R9
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 150.1.9.9 255.255.255.255
+ ipv6 address 2001:150:9:9::9/128
+!
+interface Loopback112
+ ip address 112.0.0.1 255.0.0.0
+ ipv6 address 2001:254:0:112::1/64
+!
+interface Loopback113
+ ip address 113.0.0.1 255.0.0.0
+ ipv6 address 2001:254:0:113::1/64
+!
+interface Loopback114
+ ip address 114.0.0.1 255.0.0.0
+ ipv6 address 2001:254:0:114::1/64
+!
+interface Loopback115
+ ip address 115.0.0.1 255.0.0.0
+ ipv6 address 2001:254:0:115::1/96
+!
+interface Loopback116
+ ip address 116.0.0.1 255.0.0.0
+!
+interface Loopback117
+ ip address 117.0.0.1 255.0.0.0
+!
+interface Loopback118
+ ip address 118.0.0.1 255.0.0.0
+!
+interface Loopback119
+ ip address 119.0.0.1 255.0.0.0
+!
+interface Loopback51001
+ ip address 51.0.0.1 255.255.0.0
+!
+interface Loopback51101
+ ip address 51.1.0.1 255.255.0.0
+!
+interface Loopback51201
+ ip address 51.2.0.1 255.255.0.0
+!
+interface Loopback51301
+ ip address 51.3.0.1 255.255.0.0
+!
+interface Loopback51401
+ ip address 51.4.0.1 255.255.0.0
+!
+interface Loopback51501
+ ip address 51.5.0.1 255.255.0.0
+!
+interface Loopback51601
+ ip address 51.6.0.1 255.255.0.0
+!
+interface Loopback51701
+ ip address 51.7.0.1 255.255.0.0
+!
+interface Loopback200000
+ ip address 200.0.0.1 255.255.255.0
+!
+interface Loopback200010
+ ip address 200.0.1.1 255.255.255.0
+!
+interface Loopback200020
+ ip address 200.0.2.1 255.255.255.0
+!
+interface Loopback200030
+ ip address 200.0.3.1 255.255.255.0
+!
+interface Loopback2121801
+ ip address 212.18.0.1 255.255.255.0
+!
+interface Loopback2121811
+ ip address 212.18.1.1 255.255.255.0
+!
+interface Loopback2121821
+ ip address 212.18.2.1 255.255.255.0
+!
+interface Loopback2121831
+ ip address 212.18.3.1 255.255.255.0
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ cdp enable
+ no shut
+!
+interface GigabitEthernet1.9
+ encapsulation dot1Q 9
+ ip address 155.1.9.9 255.255.255.0
+ ipv6 address 2001:155:1:9::9/64
+!
+interface GigabitEthernet1.79
+ encapsulation dot1Q 79
+ ip address 155.1.79.9 255.255.255.0
+ ipv6 address 2001:155:1:79::9/64
+!
+interface GigabitEthernet1.109
+ encapsulation dot1Q 109
+ ip address 155.1.109.9 255.255.255.0
+ ipv6 address 2001:155:1:109::9/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 54
+ bgp log-neighbor-changes
+ neighbor 155.1.79.7 remote-as 100
+ neighbor 155.1.109.10 remote-as 54
+ neighbor 155.1.37.3 remote-as 100
+ neighbor 155.1.37.3 local-as 100
+ neighbor 155.1.37.3 ebgp-mulithop 255 
+ !
+ address-family ipv4
+  neighbor 155.1.37.3 activate
+  neighbor 155.1.37.3 route-map DENY_ALL in
+  neighbor 155.1.37.3 route-map DENY_ALL out
+  network 112.0.0.0
+  network 113.0.0.0
+  network 114.0.0.0 route-map SET_COMMUNITY_54
+  network 115.0.0.0 route-map SET_COMMUNITY_54
+  network 116.0.0.0
+  network 117.0.0.0
+  network 118.0.0.0
+  network 119.0.0.0
+  neighbor 155.1.79.7 activate
+  neighbor 155.1.79.7 send-community both
+  neighbor 155.1.79.7 route-map BGP_IN in
+  neighbor 155.1.79.7 route-map BGP_OUT out
+  neighbor 155.1.109.10 activate
+  neighbor 155.1.109.10 next-hop-self
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip as-path access-list 1 permit ^$
+no ip http server
+no ip http secure-server
+ip route 155.1.108.0 255.255.255.0 155.1.109.10
+ip route 204.12.8.8 255.255.255.255 155.1.79.7
+ip route 155.1.0.0 255.255.0.0 155.1.79.7
+!
+!
+ip prefix-list BGP_PREPEND_1 seq 5 permit 112.0.0.0/8
+ip prefix-list BGP_PREPEND_1 seq 10 permit 113.0.0.0/8
+!
+ip prefix-list DEFAULT seq 5 permit 0.0.0.0/0
+!
+ip prefix-list DENY_DEFAULT seq 5 deny 0.0.0.0/0
+ip prefix-list DENY_DEFAULT seq 10 permit 0.0.0.0/0 le 32
+!
+route-map DENY_ALL deny 10
+!
+route-map BGP_IN deny 10
+ match ip address prefix-list DEFAULT
+!
+route-map BGP_IN permit 10000
+!
+route-map SET_COMMUNITY_54 permit 10
+ set community 54
+!
+route-map BGP_OUT permit 10
+ match ip address prefix-list BGP_PREPEND_1
+ set as-path prepend 50 60
+!
+route-map BGP_OUT permit 10000
+ match as-path 1
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+!
+!
+end
+!
+end

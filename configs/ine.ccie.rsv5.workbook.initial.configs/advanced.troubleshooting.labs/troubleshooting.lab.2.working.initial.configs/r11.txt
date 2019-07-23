@@ -1,0 +1,244 @@
+
+!
+! Last configuration change at 23:49:04 UTC Tue Oct 7 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R11
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Colo-Site
+ rd 65001:65003
+ route-target export 65001:65001
+ route-target import 65001:65001
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteB
+ rd 65001:65001
+ route-target export 65001:65001
+ route-target import 65001:65001
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteC
+ rd 65001:65002
+ route-target export 65001:65001
+ route-target import 65001:65001
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging console
+enable secret 5 $1$7UOa$ZKIL408uFDRGVCgxRKPiP/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9T8WPK3T4YM
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description SP_B Loopback
+ ip address 172.69.0.100 255.255.255.255
+ ip router isis SP_B
+ ipv6 address 2001:172:69::100/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.911
+ encapsulation dot1Q 911
+ vrf forwarding Colo-Site
+ ip address 180.10.119.1 255.255.255.254
+ ipv6 address 2001:180:10:119::1/127
+!
+interface GigabitEthernet1.1112
+ encapsulation dot1Q 1112
+ vrf forwarding SiteC
+ ip address 180.10.121.0 255.255.255.254
+ ipv6 address 2001:180:10:121::/127
+!
+interface GigabitEthernet1.1114
+ encapsulation dot1Q 1114
+ ip address 172.69.0.0 255.255.255.254
+ ip router isis SP_B
+ ipv6 address 2001:172:69::/127
+ mpls ip
+!
+interface GigabitEthernet1.1120
+ encapsulation dot1Q 1120
+ vrf forwarding SiteB
+ ip address 180.10.112.0 255.255.255.254
+ ipv6 address 2001:180:10:112::/127
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast vrf SiteB autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65001 metric 1000000 100000 255 1 1500
+  exit-af-topology
+  network 180.10.0.0
+ exit-address-family
+!
+router isis SP_B
+ net 49.0000.0000.0011.00
+ is-type level-2-only
+ log-adjacency-changes
+!
+router bgp 65001
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 172.69.0.200 remote-as 65001
+ neighbor 172.69.0.200 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 172.69.0.200 activate
+  neighbor 172.69.0.200 send-community extended
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 172.69.0.200 activate
+  neighbor 172.69.0.200 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.119.0 remote-as 65003
+  neighbor 180.10.119.0 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteB
+  redistribute eigrp 56
+ exit-address-family
+ !
+ address-family ipv6 vrf SiteB
+  redistribute connected
+  neighbor 2001:180:10:112::1 remote-as 65002
+  neighbor 2001:180:10:112::1 activate
+  neighbor 2001:180:10:112::1 default-originate
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteC
+  neighbor 180.10.121.1 remote-as 65003
+  neighbor 180.10.121.1 ttl-security hops 1
+  neighbor 180.10.121.1 activate
+  neighbor 180.10.121.1 as-override
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

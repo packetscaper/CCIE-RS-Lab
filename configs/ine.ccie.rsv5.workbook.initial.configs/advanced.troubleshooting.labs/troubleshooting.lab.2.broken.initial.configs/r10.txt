@@ -1,0 +1,354 @@
+
+!
+! Last configuration change at 01:32:03 UTC Sun Aug 10 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition EXTRANET
+ rd 54:54
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SERVER1
+ rd 1:1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SERVER2
+ rd 2:2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging console
+enable secret 5 $1$nK/9$bxhg9TGHS9v6XFharA/0a1
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+ipv6 rip vrf-mode enable
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Internet ISP Loopback
+ ip address 44.2.5.100 255.255.255.255
+ ipv6 address 2001:44:2:5::100/128
+!
+interface Loopback9
+ ip address 30.9.0.1 255.255.0.0
+ ipv6 address 2001:30:9:1::1/64
+!
+interface Loopback10
+ vrf forwarding EXTRANET
+ ip address 30.0.0.1 255.255.0.0
+ ipv6 address 2001:30::1/64
+!
+interface Loopback11
+ vrf forwarding EXTRANET
+ ip address 30.1.0.1 255.255.0.0
+ ipv6 address 2001:30:1::1/64
+!
+interface Loopback12
+ vrf forwarding EXTRANET
+ ip address 30.2.0.1 255.255.0.0
+ ipv6 address 2001:30:2::1/64
+!
+interface Loopback13
+ vrf forwarding EXTRANET
+ ip address 30.3.0.1 255.255.0.0
+ ipv6 address 2001:30:3::1/64
+!
+interface Loopback14
+ vrf forwarding EXTRANET
+ ip address 31.0.0.1 255.255.0.0
+ ipv6 address 2001:31::1/64
+!
+interface Loopback15
+ vrf forwarding EXTRANET
+ ip address 31.1.0.1 255.255.0.0
+ ipv6 address 2001:31:1::1/64
+!
+interface Loopback16
+ vrf forwarding EXTRANET
+ ip address 31.2.0.1 255.255.0.0
+ ipv6 address 2001:31:2::1/64
+!
+interface Loopback17
+ vrf forwarding EXTRANET
+ ip address 31.3.0.1 255.255.0.0
+ ipv6 address 2001:31:3::1/64
+!
+interface Loopback18
+ vrf forwarding EXTRANET
+ ip address 28.119.16.1 255.255.255.0
+ ipv6 address 2001:28:119:16::1/64
+!
+interface Loopback19
+ vrf forwarding EXTRANET
+ ip address 28.119.17.1 255.255.255.0
+ ipv6 address 2001:28:119:17::1/64
+!
+interface Loopback44
+ description r6-nat-interface
+ ip address 44.6.6.6 255.255.255.255
+ ip nat outside
+!
+interface Loopback105
+ vrf forwarding SERVER1
+ ip address 180.10.100.100 255.255.255.255
+ ipv6 address 2001:180:10:100::100/128
+ ipv6 rip RIPng enable
+!
+interface Loopback110
+ vrf forwarding SERVER2
+ ip address 180.10.200.100 255.255.255.255
+ ipv6 address 2001:180:10:200::100/128
+ ipv6 rip RIPng enable
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.105
+ encapsulation dot1Q 105
+ vrf forwarding SERVER1
+ ip address 180.10.105.100 255.255.255.0
+ ipv6 address 2001:180:10:105::100/64
+ ipv6 rip RIPng enable
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ ip address 44.2.5.0 255.255.255.254
+ ip nat outside
+ ipv6 address 2001:44:2:5::/127
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 44.2.5.2 255.255.255.254
+ ip nat outside
+ ipv6 address 2001:44:2:5::2/127
+!
+interface GigabitEthernet1.610
+ encapsulation dot1Q 610
+ ip address 44.2.5.4 255.255.255.254
+ ip nat inside
+ ipv6 address 2001:44:2:5::4/127
+!
+interface GigabitEthernet1.710
+ encapsulation dot1Q 710
+ ip address 44.2.5.6 255.255.255.254
+ ipv6 address 2001:44:2:5::6/127
+!
+interface GigabitEthernet1.1012
+ encapsulation dot1Q 1012
+ ip address 44.2.5.8 255.255.255.254
+ ip nat outside
+ ipv6 address 2001:44:2:5::8/127
+!
+interface GigabitEthernet1.1014
+ encapsulation dot1Q 1014
+ vrf forwarding EXTRANET
+ ip address 54.1.254.10 255.255.255.0
+ ipv6 address 2001:54:1:254::A/64
+!
+interface GigabitEthernet1.1019
+ encapsulation dot1Q 1019
+ ip address 44.2.5.10 255.255.255.254
+ ipv6 address 2001:44:2:5::A/127
+!
+interface GigabitEthernet1.1020
+ encapsulation dot1Q 1020
+ ip address 44.2.5.12 255.255.255.254
+ ipv6 address 2001:44:2:5::C/127
+!
+interface GigabitEthernet1.1210
+ encapsulation dot1Q 1210
+ vrf forwarding SERVER2
+ ip address 180.10.120.100 255.255.255.0
+ ipv6 address 2001:180:10:120::100/64
+ ipv6 rip RIPng enable
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+
+!
+router rip
+ version 2
+ no auto-summary
+ !
+ address-family ipv4 vrf SERVER2
+  network 180.10.0.0
+  no auto-summary
+ exit-address-family
+ !
+ address-family ipv4 vrf SERVER1
+  network 180.10.0.0
+  no auto-summary
+ exit-address-family
+!
+router bgp 101
+ bgp log-neighbor-changes
+ bgp bestpath compare-routerid
+ bgp bestpath igp-metric ignore
+ bgp recursion host
+ redistribute connected route-map INTERNET_CONNECTED_ROUTES
+ neighbor 44.2.5.1 remote-as 6618605
+ neighbor 44.2.5.1 send-community both
+ neighbor 44.2.5.3 remote-as 6618605
+ neighbor 44.2.5.3 send-community both
+ neighbor 44.2.5.5 remote-as 65004
+ neighbor 44.2.5.5 send-community both
+ neighbor 44.2.5.7 remote-as 65004
+ neighbor 44.2.5.7 send-community both
+ neighbor 44.2.5.9 remote-as 65003
+ neighbor 44.2.5.9 send-community both
+ neighbor 44.2.5.11 remote-as 65002
+ neighbor 44.2.5.11 send-community both
+ neighbor 44.2.5.13 remote-as 65002
+ neighbor 44.2.5.13 send-community both
+ !
+ address-family ipv4 vrf EXTRANET
+  network 28.119.16.1 mask 255.255.255.255
+  network 28.119.17.1 mask 255.255.255.255
+  redistribute connected metric 12345 route-map EXTRANET_ROUTES
+  neighbor 54.1.254.14 remote-as 6618605
+  neighbor 54.1.254.14 local-as 5454 no-prepend replace-as
+  neighbor 54.1.254.14 activate
+  neighbor 54.1.254.14 send-community
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip nat inside source static 44.2.5.5 30.9.0.1
+ip forward-protocol nd
+!
+ip bgp-community new-format
+no ip http server
+no ip http secure-server
+ip access-list helper egress check
+!
+!
+ip prefix-list EXTRANET_ROUTES seq 5 permit 30.0.0.0/7 le 32
+!
+ip prefix-list INTERNET_CONNECTED_ROUTES seq 5 permit 44.0.0.0/8 le 32
+ipv6 router rip RIPng
+ !
+ address-family ipv6 vrf SERVER2
+ exit-address-family
+ !
+ address-family ipv6 vrf SERVER1
+ exit-address-family
+!
+!
+route-map INTERNET_CONNECTED_ROUTES permit 5
+ match interface Loopback44
+ set community 101:9999
+!
+route-map INTERNET_CONNECTED_ROUTES permit 10
+ match ip address prefix-list INTERNET_CONNECTED_ROUTES
+ set community 101:9999
+!
+route-map EXTRANET_ROUTES permit 10
+ match ip address prefix-list EXTRANET_ROUTES
+ set community 5454:100
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

@@ -1,0 +1,18 @@
+router eigrp 100
+
+{%for subinterface in subinterfaces%}
+
+{%if subinterface.subint !=100%}
+network 155.1.{{subinterface.subint}}.{{id}} 0.0.0.0
+{%endif%}
+{% endfor %}
+
+network 150.1.{{id}}.{{id}} 0.0.0.0 
+
+{% if id == 1 or id == 2 or id == 3 or id ==5 %}
+
+network 155.1.0.{{id}} 0.0.0.0
+interface Tunnel0
+ no ip split-horizon eigrp 100
+
+{% endif %}

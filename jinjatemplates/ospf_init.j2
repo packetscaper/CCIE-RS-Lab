@@ -1,0 +1,44 @@
+{% if id == 1 or id == 2 or id == 3 or id ==5 %}
+
+int Tunnel0
+ip ospf network point-to-multipoint non-broadcast
+
+{% endif %}
+
+router ospf 1
+
+{%for subinterface in subinterfaces%}
+
+{%if subinterface.subint !=100%}
+network 155.1.{{subinterface.subint}}.0 0.0.0.255 area {{subinterface.area}} 
+{%endif%}
+{% endfor %}
+
+{%if id == 9 or id == 7%}
+  {%set area = 2 %}
+{% elif id == 6 %}
+  {% set area = 1 %}
+{%elif id == 8 or id == 10%}
+  {% set area = 3 %}
+{%else%}
+ {% set area = 0 %}
+
+{%endif%}
+
+network 150.1.{{id}}.0 0.0.0.255 area {{ area }}
+
+{% if id == 1 or id == 2 or id == 3 or id ==5 %}
+
+network 155.1.0.0 0.0.0.255 area 0
+
+
+{% endif %}
+
+{% if id == 5 %}
+
+neighbor 155.1.0.1
+neighbor 155.1.0.2
+neighbor 155.1.0.3
+neighbor 155.1.0.4
+
+{% endif %}

@@ -1,0 +1,130 @@
+enable
+configure terminal
+
+! Current configuration : 1370 bytes
+!
+! Last configuration change at 17:05:00 UTC Tue Oct 7 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9433QKU0O4I
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.7 255.255.255.255
+ ipv6 address 2001:10:255:255::7/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 172.31.17.7 255.255.255.0
+ ipv6 address 2001:172:31:17::7/64
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.31.78.7 255.255.255.0
+ ipv6 address 2001:172:31:78::7/64
+!
+interface GigabitEthernet1.227
+ encapsulation dot1Q 227
+ ip address 172.31.227.7 255.255.255.0
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R7#

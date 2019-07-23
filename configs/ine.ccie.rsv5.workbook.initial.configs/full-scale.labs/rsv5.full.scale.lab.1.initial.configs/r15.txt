@@ -1,0 +1,281 @@
+
+!
+! Last configuration change at 23:01:34 UTC Thu Sep 18 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition internet
+ rd 65123:65123
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-1248692706
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1248692706
+ revocation-check none
+ rsakeypair TP-self-signed-1248692706
+!
+!
+crypto pki certificate chain TP-self-signed-1248692706
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31323438 36393237 3036301E 170D3134 30383039 31393532 
+  35355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 32343836 
+  39323730 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100A80D 4288A8C6 E186CA59 900D8EE2 8864C511 D23A0BAB 3C29E83C 52161466 
+  3C681088 79E59CF4 350E3F26 E6FAA1D8 92F540EA 3D209779 8FDA9C37 530C4678 
+  D48AF5E1 E0649F46 4DCECE79 B364D742 319FCA29 93EDC4FD 00C9DC34 0BC49512 
+  8A591E76 B19744AE 1E06A28D FF647013 38E6E567 9F4963DE C140FF97 6485291A 
+  17DD0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 14A29884 484F9E54 97E8EFC9 C6854495 E3083B5C 9C301D06 
+  03551D0E 04160414 A2988448 4F9E5497 E8EFC9C6 854495E3 083B5C9C 300D0609 
+  2A864886 F70D0101 05050003 81810004 3C042BE6 7F45C1C7 C2A8B95A 3767A554 
+  4451146F 7CF6B1B8 57D0BA07 DA973313 238C9069 F780C750 ADB21B3A 22723E24 
+  DA0F2184 A94C61E6 39C342A4 98C909A0 24A1EF48 9D81B7E8 A86F78FE DB41504F 
+  8E77DD00 1E503210 D299BD06 BE62F420 2ADAF31F CD28ECD2 319DEF42 546A3CAE 
+  888F026C 6B7D1094 5D12F164 16F479
+  	quit
+license udi pid CSR1000V sn 9FSD6IRBA2E
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$IKXX$nFdbE6Pr.gJqZI5FbiaNA.
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.15 255.255.255.255
+ ipv6 address ::192:122:3:15/128
+!
+!
+interface Loopback44
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:4:2:2::1/128
+!
+interface Loopback88
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2008:8:8:8::8/128
+!
+interface Loopback144
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:144:4:4::100/128
+!
+interface Loopback160
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2006::1/16
+!
+interface Loopback180
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:180::2/32
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ vrf forwarding internet
+ ip address 202.4.60.1 255.255.255.254
+ ipv6 address 2001:202:4:60::1/127
+!
+interface GigabitEthernet1.134
+ encapsulation dot1Q 134
+ ip address 172.19.134.15 255.255.255.128
+ ipv6 address 2001:172:19:134::15/64
+!
+interface GigabitEthernet1.160
+ encapsulation dot1Q 160
+ vrf forwarding server3
+ ip address 172.23.160.100 255.255.255.0
+ ipv6 address 2001:172:23:160::100/64
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ vrf forwarding server2
+ ip address 172.25.170.100 255.255.255.0
+ ipv6 address 2001:172:25:170::100/64
+!
+interface GigabitEthernet1.180
+ encapsulation dot1Q 180
+ vrf forwarding internet
+ ip address 202.4.180.1 255.255.255.254
+ ipv6 address 2001:202:4:180::1/127
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ vrf forwarding server1
+ ip address 172.27.192.100 255.255.255.0
+ ipv6 address 2001:172:27:192::100/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.15 255.255.255.0
+ negotiation auto
+!
+router eigrp SERVERS
+ !
+ address-family ipv4 unicast vrf server2 autonomous-system 123
+  !
+  topology base
+  exit-af-topology
+  network 172.25.170.100 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf server3 autonomous-system 123
+  !
+  topology base
+  exit-af-topology
+  network 172.23.160.100 0.0.0.0
+ exit-address-family
+!
+!
+router bgp 65123
+ bgp log-neighbor-changes
+ !
+ address-family ipv4 vrf internet
+  neighbor 202.4.60.0 remote-as 65006
+  neighbor 202.4.60.0 activate
+  neighbor 202.4.180.0 remote-as 65456
+  neighbor 202.4.180.0 activate
+ exit-address-family
+  !
+ address-family ipv6 vrf internet
+ 	redistribute connected route-map IPv6_INTERNET_ROUTES
+  neighbor 2001:202:4:60:: remote-as 65600
+  neighbor 2001:202:4:60:: activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+ip route vrf server1 0.0.0.0 0.0.0.0 GigabitEthernet1.192 172.27.192.254
+!
+!
+route-map IPv6_INTERNET_ROUTES permit 10
+ match interface Loopback44 Loopback88 Loopback144 Loopback160 Loopback180
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

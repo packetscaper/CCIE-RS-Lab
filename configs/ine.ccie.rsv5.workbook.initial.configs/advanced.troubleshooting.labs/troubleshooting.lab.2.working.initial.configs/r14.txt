@@ -1,0 +1,273 @@
+
+!
+! Last configuration change at 23:49:04 UTC Tue Oct 7 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition HQ
+ rd 14:14
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteA
+ rd 65001:65001
+ route-target export 65001:65001
+ route-target import 65001:65001
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging console
+enable secret 5 $1$BJIP$8HTU9yVB7gtRSh9OTSBnV1
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9CV7ZTTD0F1
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+bfd slow-timers 30000
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description SP_B Loopback
+ ip address 172.69.0.200 255.255.255.255
+ ip router isis SP_B
+ ipv6 address 2001:172:69::200/128
+!
+interface Loopback1
+ description Coorporate Loopback
+ vrf forwarding HQ
+ ip address 172.16.1.14 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 51 area 51
+ ipv6 address 2001:172:16:1::14/128
+!
+interface Loopback2
+ description IPv6 Loopback
+ vrf forwarding HQ
+ no ip address
+ ipv6 address 2001:192:168:1::1/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.114
+ encapsulation dot1Q 114
+ vrf forwarding HQ
+ ip address 180.10.114.14 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network broadcast
+ ip ospf 51 area 51
+ ipv6 address 2001:180:10:114::14/64
+ ospfv3 51 ipv6 area 51
+!
+interface GigabitEthernet1.314
+ encapsulation dot1Q 314
+ vrf forwarding HQ
+ ip address 180.10.143.14 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 51 area 51
+ ipv6 address 2001:180:10:143::14/64
+ ospfv3 51 ipv6 area 51
+!
+interface GigabitEthernet1.714
+ encapsulation dot1Q 714
+ vrf forwarding SiteA
+ ip address 180.10.147.1 255.255.255.254
+ ipv6 address 2001:180:10:147::1/127
+ bfd interval 150 min_rx 150 multiplier 3
+!
+interface GigabitEthernet1.1014
+ encapsulation dot1Q 1014
+ vrf forwarding HQ
+ ip address 54.1.254.14 255.255.255.0
+ ipv6 address 2001:54:1:254::E/64
+!
+interface GigabitEthernet1.1114
+ encapsulation dot1Q 1114
+ ip address 172.69.0.1 255.255.255.254
+ ip router isis SP_B
+ ipv6 address 2001:172:69::1/127
+ mpls ip
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast vrf SiteA autonomous-system 56
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospfv3 51
+ !
+ address-family ipv6 unicast vrf HQ
+  area 51 nssa
+ exit-address-family
+!
+router ospf 51 vrf HQ
+ router-id 172.16.1.14
+ ispf
+ auto-cost reference-bandwidth 100000
+ capability vrf-lite
+ area 51 nssa
+ redistribute bgp 65001 subnets
+!
+router isis SP_B
+ net 49.0000.0000.0014.00
+ is-type level-2-only
+ log-adjacency-changes
+!
+router bgp 65001
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2001:180:10:147:: remote-as 65004
+ neighbor 172.69.0.100 remote-as 65001
+ neighbor 172.69.0.100 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 172.69.0.100 activate
+  neighbor 172.69.0.100 send-community extended
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 172.69.0.100 activate
+  neighbor 172.69.0.100 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf HQ
+  network 180.10.114.0 mask 255.255.255.0
+  aggregate-address 180.10.0.0 255.255.0.0 summary-only
+  neighbor 54.1.254.10 remote-as 5454
+  neighbor 54.1.254.10 local-as 6618605 no-prepend replace-as
+  neighbor 54.1.254.10 activate
+  distance bgp 20 200 255
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteA
+  neighbor 180.10.147.0 remote-as 65004
+  neighbor 180.10.147.0 fall-over bfd
+  neighbor 180.10.147.0 activate
+ exit-address-family
+ !
+ address-family ipv6 vrf SiteA
+  redistribute connected
+  neighbor 2001:180:10:147:: remote-as 65004
+  neighbor 2001:180:10:147:: activate
+  neighbor 2001:180:10:147:: default-originate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

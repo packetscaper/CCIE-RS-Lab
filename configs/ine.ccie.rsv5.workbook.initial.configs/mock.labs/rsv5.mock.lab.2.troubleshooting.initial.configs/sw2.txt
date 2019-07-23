@@ -1,0 +1,162 @@
+
+!
+! Last configuration change at 21:38:50 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:38:30 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+system mtu routing 1500
+vtp domain INE
+vtp mode transparent
+ip routing
+no ip domain-lookup
+!
+ip vrf A
+!
+!
+!
+ip multicast-routing distributed
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+spanning-tree vlan 1723 priority 0
+!
+vlan internal allocation policy ascending
+!
+vlan 227-228
+!
+vlan 999
+ name CCIE_VLAN
+!
+vlan 1623,1723
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip vrf forwarding A
+ ip address 10.255.255.22 255.255.255.255
+ ip ospf 2 area 0
+!
+interface Port-channel12
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Port-channel23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Port-channel24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface range FastEthernet0/1 - 18
+ shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 12 mode active
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 12 mode active
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no shutdown
+!
+interface Vlan227
+ ip vrf forwarding A
+ ip address 172.31.227.22 255.255.255.0
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+ ip ospf 1 area 0
+!
+interface Vlan228
+ ip vrf forwarding A
+ ip address 172.31.228.22 255.255.255.0
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+ ip ospf 1 area 0
+!
+router ospf 1 vrf A
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+ntp authentication-key 123 md5 132B2322205F3D 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp server 10.255.255.8 key 123
+end

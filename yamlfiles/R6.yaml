@@ -1,0 +1,35 @@
+---
+  
+  id : 6 
+
+  interface : Ethernet0/0
+  
+  subinterfaces:
+
+      - subint : 146 
+        des : connected to R4 and R6
+        area : 1 
+
+      - subint : 67 
+        des : connected to R7
+        area : 2
+
+
+
+  
+  AS : 100
+
+  BGP : 
+
+   neighbors:
+
+     - neighbor  : 155.1.146.1
+       AS        : 100
+
+     - neighbor : 155.1.67.7
+       AS       : 300
+
+
+
+
+

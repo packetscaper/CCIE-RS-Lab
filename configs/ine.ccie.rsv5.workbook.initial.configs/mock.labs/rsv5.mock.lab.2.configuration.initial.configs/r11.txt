@@ -1,0 +1,181 @@
+
+!
+! Last configuration change at 00:16:52 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R11
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Colo-Site
+ rd 65001:65003
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteB
+ rd 65001:65001
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition SiteC
+ rd 65001:65002
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$7UOa$ZKIL408uFDRGVCgxRKPiP/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9T8WPK3T4YM
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description SP_B Loopback
+ ip address 172.69.0.100 255.255.255.255
+ ip ospf 65001 area 65001
+ ipv6 address 2001:172:69::100/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.911
+ encapsulation dot1Q 911
+ vrf forwarding Colo-Site
+ ip address 180.10.119.1 255.255.255.254
+ ipv6 address 2001:180:10:119::1/127
+!
+interface GigabitEthernet1.1112
+ encapsulation dot1Q 1112
+ vrf forwarding SiteC
+ ip address 180.10.121.0 255.255.255.254
+ ipv6 address 2001:180:10:121::/127
+!
+interface GigabitEthernet1.1114
+ encapsulation dot1Q 1114
+ ip address 172.69.0.0 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 65001 area 65001
+ ipv6 address 2001:172:69::/127
+!
+interface GigabitEthernet1.1120
+ encapsulation dot1Q 1120
+ vrf forwarding SiteB
+ ip address 180.10.112.0 255.255.255.254
+ ipv6 address 2001:180:10:112::/127
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 65001
+ router-id 172.69.0.100
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

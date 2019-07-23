@@ -1,0 +1,152 @@
+
+!
+! Last configuration change at 23:01:11 UTC Thu Sep 18 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9DMEUSB233Y
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$9H4L$UfimLXQ4lSPzrWHodspQL/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.2 255.255.255.255
+ ipv6 address ::192:122:3:2/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:12::2/126
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.0.23.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:23::1/126
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 10.0.24.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:24::1/126
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 202.4.210.2 255.255.255.0
+ ipv6 address 2001:202:4:210::2/64
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 202.4.216.2 255.255.255.192
+ ip pim sparse-mode
+ ipv6 address 2001:202:4:216::2/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.2 255.255.255.0
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

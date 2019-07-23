@@ -1,0 +1,57 @@
+hostname R4
+!
+vrf definition 1
+ rd 1:1
+ route-target export 1:1
+ route-target import 1:1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no ip domain lookup
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ vrf forwarding 1
+ ip address 4.4.4.4 255.255.255.255
+ ipv6 address 2001:4:4:4::4/128
+!
+interface GigabitEthernet1
+ no shutdown
+!
+interface GigabitEthernet1.46
+ encapsulation dot1Q 46
+ vrf forwarding 1
+ ip address 200.1.46.4 255.255.255.0
+ ipv6 address 2001:200:1:46::4/64
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ vrf forwarding 1
+ ip address 200.1.24.4 255.255.255.0
+ ipv6 address 2001:200:1:24::4/64
+!
+router bgp 4
+ bgp router-id 4.4.4.4
+ !
+  address-family ipv4 vrf 1
+  redistribute connected
+  neighbor 200.1.46.6 remote-as 65056
+  neighbor 200.1.46.6 activate
+  neighbor 200.1.24.2 remote-as 65012
+  neighbor 200.1.24.2 activate
+ exit-address-family
+ !
+ address-family ipv6 vrf 1
+  redistribute connected
+  neighbor 2001:200:1:46::6 remote-as 65056
+  neighbor 2001:200:1:46::6 activate
+  neighbor 2001:200:1:24::2 remote-as 65012
+  neighbor 2001:200:1:24::2 activate
+ exit-address-family
+!
+end

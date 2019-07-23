@@ -1,0 +1,206 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9ZKEEWZ6S6H
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr 3des
+ authentication pre-share
+ group 5
+crypto isakmp key DMVPNPASS address 0.0.0.0
+!
+!
+crypto ipsec transform-set ESP-AES-128-MD5 esp-aes esp-md5-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP-AES-128-MD5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.17 255.255.255.255
+ ipv6 address 2001:10:255:255::17/128
+!
+interface Tunnel2
+ ip address 183.100.2.17 255.255.255.0
+ no ip redirects
+ ip nhrp authentication DMVPN2
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 2
+ delay 2000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 2
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ ip address 169.254.170.0 255.255.255.254
+ ipv6 address 2001:169:254:170::/127
+!
+interface GigabitEthernet1.1723
+ encapsulation dot1Q 1723
+ ip address 183.17.23.17 255.255.255.0
+ ipv6 address 2001:183:17:23::17/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp SITE_W
+ !
+ address-family ipv4 unicast autonomous-system 1831
+  !
+  af-interface Tunnel2
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 1831
+  !
+  af-interface GigabitEthernet1.170
+   shutdown
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router bgp 1831
+ bgp log-neighbor-changes
+ neighbor 2001:169:254:170::1 remote-as 10000
+ neighbor 169.254.170.1 remote-as 10000
+ !
+ address-family ipv4
+  bgp scan-time 5
+  network 10.255.255.17 mask 255.255.255.255
+  no neighbor 2001:169:254:170::1 activate
+  neighbor 169.254.170.1 activate
+  neighbor 169.254.170.1 advertisement-interval 0
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:10:255:255::17/128
+  neighbor 2001:169:254:170::1 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

@@ -1,0 +1,157 @@
+enable
+configure terminal
+
+! Current configuration : 2076 bytes
+!
+! Last configuration change at 17:58:51 UTC Wed Oct 8 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 95OSJ0DCRXR
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.6 255.255.255.255
+ ipv6 address 2001:10:255:255::6/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.26
+ encapsulation dot1Q 26
+ ip address 10.255.8.2 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.255.11.2 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.255.10.2 255.255.255.252
+ ipv6 enable
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 169.254.60.0 255.255.255.254
+ ipv6 address 2001:169:254:60::/127
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:60::1 remote-as 30000
+ neighbor 169.254.60.1 remote-as 30000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 169.254.60.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:169:254:60::1 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R6#

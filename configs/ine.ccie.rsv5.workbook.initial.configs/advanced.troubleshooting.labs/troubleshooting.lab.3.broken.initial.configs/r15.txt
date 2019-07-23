@@ -1,0 +1,286 @@
+
+!
+! Last configuration change at 00:20:54 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition internet
+ rd 65123:65123
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition server3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+no ip dhcp use vrf connected
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 9FSD6IRBA2E
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$IKXX$nFdbE6Pr.gJqZI5FbiaNA.
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.15 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address ::192:122:3:15/128
+ ospfv3 5 ipv6 area 5
+!
+interface Loopback44
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:4:2:2::1/128
+!
+interface Loopback88
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2008:8:8:8::8/128
+!
+interface Loopback144
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:144:4:4::100/128
+!
+interface Loopback160
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2006::1/16
+!
+interface Loopback180
+ vrf forwarding internet
+ no ip address
+ ipv6 address 2004:180::2/32
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ vrf forwarding internet
+ ip address 202.4.60.1 255.255.255.254
+ ipv6 address 2001:202:4:60::1/127
+!
+interface GigabitEthernet1.134
+ encapsulation dot1Q 134
+ ip address 172.19.134.15 255.255.255.128
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:134::15/64
+ ospfv3 5 ipv6 area 5
+!
+interface GigabitEthernet1.160
+ encapsulation dot1Q 160
+ vrf forwarding server3
+ ip address 172.23.160.100 255.255.255.0
+ ipv6 address autoconfig
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ vrf forwarding server2
+ ip address 172.25.170.100 255.255.255.0
+ ipv6 address 2001:172:25:170::100/64
+!
+interface GigabitEthernet1.180
+ encapsulation dot1Q 180
+ vrf forwarding internet
+ ip address 202.4.180.1 255.255.255.254
+ ipv6 address 2001:202:4:180::1/127
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ vrf forwarding server1
+ ip address 172.27.192.100 255.255.255.0
+ ipv6 address 2001:172:27:192::100/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.15 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp SERVERS
+ !
+ address-family ipv4 unicast vrf server2 autonomous-system 123
+  !
+  topology base
+  exit-af-topology
+  network 172.25.170.100 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf server3 autonomous-system 123
+  !
+  topology base
+  exit-af-topology
+  network 172.23.160.100 0.0.0.0
+ exit-address-family
+!
+router ospfv3 5
+ router-id 192.122.3.15
+ !
+ address-family ipv4 unicast
+ exit-address-family
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+router ospf 5
+ router-id 192.122.3.15
+ redistribute eigrp 789 subnets 
+!
+router bgp 65123
+ bgp log-neighbor-changes
+ !
+ address-family ipv4 vrf internet
+  neighbor 202.4.60.0 remote-as 65006
+  neighbor 202.4.60.0 activate
+  neighbor 202.4.180.0 remote-as 65456
+  neighbor 202.4.180.0 activate
+ exit-address-family
+ !
+ address-family ipv6 vrf internet
+  redistribute connected route-map IPv6_INTERNET_ROUTES
+  neighbor 2001:202:4:60:: remote-as 65600
+  neighbor 2001:202:4:60:: activate
+  neighbor 2001:202:4:60:: send-community both
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+ip route vrf server1 0.0.0.0 0.0.0.0 GigabitEthernet1.192 172.27.192.254
+!
+!
+route-map IPv6_INTERNET_ROUTES permit 10
+ match interface Loopback88 Loopback144 Loopback160 Loopback180
+!
+route-map IPv6_INTERNET_ROUTES permit 20
+ match interface Loopback44
+ set community 4267900929
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

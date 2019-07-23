@@ -1,0 +1,27 @@
+hostname R2
+!
+no ip domain lookup
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.255
+ ipv6 address 2001:2:2:2::2/128
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.1.12.2 255.255.255.0
+ ipv6 address 2001:10:1:12::2/64
+interface GigabitEthernet1.212
+ encapsulation dot1Q 24
+ ip address 200.1.24.2 255.255.255.0
+ ipv6 address 2001:200:1:24::2/64
+interface GigabitEthernet1.221
+ encapsulation dot1Q 221
+ ip address 10.1.221.2 255.255.255.0
+ ipv6 address 2001:10:1:221::2/64
+interface GigabitEthernet1.222
+ encapsulation dot1Q 222
+ ip address 10.1.222.2 255.255.255.0
+ ipv6 address 2001:10:1:222::2/64
+!
+end

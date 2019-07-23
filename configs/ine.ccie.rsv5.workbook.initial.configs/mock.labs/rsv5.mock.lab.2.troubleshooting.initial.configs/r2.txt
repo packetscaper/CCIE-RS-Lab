@@ -1,0 +1,297 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition SITE_A
+ rd 10.255.255.2:1
+ route-target export 1.20000:1
+ route-target import 1.20000:1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain OSPF_KEYS
+ key 1
+   key-string CISCO
+   cryptographic-algorithm hmac-sha-512
+!
+!
+license udi pid CSR1000V sn 9DMEUSB233Y
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.2 255.255.255.255
+ ip pim sparse-mode
+ ipv6 address 2001:10:255:255::2/128
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.255.0.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.20
+ encapsulation dot1Q 20
+ ip address 169.254.20.0 255.255.255.254
+ ipv6 address 2001:169:254:20::/127
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.255.7.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 10.255.4.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv6 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.25
+ encapsulation dot1Q 25
+ ip address 10.255.5.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv4 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.26
+ encapsulation dot1Q 26
+ ip address 10.255.8.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 enable
+ mpls ip
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ bfd interval 250 min_rx 250 multiplier 3
+!
+interface GigabitEthernet1.28
+ encapsulation dot1Q 28
+ vrf forwarding SITE_A
+ ip address 172.31.28.2 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 address 2001:172:31:28::2/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospfv3 1
+ prefix-suppression
+ bfd all-interfaces
+ auto-cost reference-bandwidth 1000000
+ !
+ address-family ipv4 unicast
+  redistribute ospfv3 2
+  passive-interface Loopback0
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  passive-interface Loopback0
+  redistribute ospf 2 include-connected
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+!
+router ospfv3 2
+ prefix-suppression
+ bfd all-interfaces
+ auto-cost reference-bandwidth 1000000
+ !
+ address-family ipv4 unicast
+  redistribute ospfv3 1
+  passive-interface Loopback0
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  passive-interface Loopback0
+  redistribute ospf 1 include-connected
+  area 0 authentication key-chain OSPF_KEYS
+ exit-address-family
+!
+router ospf 1 vrf SITE_A
+ redistribute bgp 1.20000 subnets
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:20::1 remote-as 10000
+ neighbor 169.254.20.1 remote-as 10000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 next-hop-self
+  neighbor 169.254.20.1 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:10:255:255::2/128
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:169:254:20::1 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf SITE_A
+  redistribute ospf 1
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip pim ssm range 5
+no ip http server
+no ip http secure-server
+!
+access-list 5 permit 226.6.6.6
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

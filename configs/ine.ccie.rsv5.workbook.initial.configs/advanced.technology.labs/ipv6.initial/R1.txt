@@ -1,0 +1,89 @@
+enable
+configure terminal
+no service timestamps debug uptime
+no service timestamps log uptime
+!
+hostname R1
+!
+no ip domain lookup
+ip routing
+ipv6 unicast-routing
+!
+cdp run
+!
+interface Loopback0
+ ipv6 address 2001:150:1:1::1/128
+ ip address 150.1.1.1 255.255.255.255
+!
+interface GigabitEthernet1
+ cdp enable
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1q 13
+ ip address 155.1.13.1 255.255.255.0
+ ipv6 address 2001:155:1:13::1/64
+!
+interface GigabitEthernet1.100
+ encapsulation dot1q 100
+ ip address 169.254.100.1 255.255.255.0
+ ipv6 address 2001:169:254:100::1/64
+!
+interface GigabitEthernet1.146
+ encapsulation dot1q 146
+ ip address 155.1.146.1 255.255.255.0
+ ipv6 address 2001:155:1:146::1/64
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+ hash md5
+! 
+crypto isakmp key 0 cisco address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_SHA esp-aes esp-sha-hmac
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_SHA
+!
+interface Tunnel0
+ ip address 155.1.0.1 255.255.255.0
+ ipv6 address 2001:155:1:1234::1/64
+ ip mtu 1400
+ ip nhrp authentication NHRPPASS
+ ip nhrp map 155.1.0.5 169.254.100.5
+ ip nhrp map multicast 169.254.100.5
+ ip nhrp network-id 1 
+ ip nhrp holdtime 300
+ ip nhrp nhs 155.1.0.5
+ ipv6 nhrp authentication NHRPPASS
+ ipv6 nhrp map 2001:155:1:1234::5/128 169.254.100.5
+ ipv6 nhrp map multicast 169.254.100.5
+ ipv6 nhrp network-id 1 
+ ipv6 nhrp holdtime 300
+ ipv6 nhrp nhs 2001:155:1:1234::5
+ tunnel source GigabitEthernet1.100
+ tunnel mode gre multipoint
+ tunnel key 150
+ tunnel protection ipsec profile DMVPN_PROFILE
+ no shutdown
+!
+router rip
+ version 2
+ network 150.1.0.0
+ network 155.1.0.0
+ no auto-summary
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+!
+line vty 0 4
+ privilege level 15
+ no login
+!
+end
+

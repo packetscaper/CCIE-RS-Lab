@@ -1,0 +1,165 @@
+
+!
+! Last configuration change at 00:01:57 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition CustB
+ rd 122.1.1.5:200
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!!
+license udi pid CSR1000V sn 9ORST0AKGHD
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.5 255.255.255.255
+ ipv6 address 2001:122:1:1::5/128
+!
+interface GigabitEthernet1
+ no shutdown
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.16.0.13 255.255.255.252
+ ipv6 address 2001:10:16::D/126
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ vrf forwarding CustB
+ ip address 12.252.100.5 255.255.255.0
+ ipv6 address 2001:12:252:100::5/64
+!
+interface GigabitEthernet1.57
+ encapsulation dot1Q 57
+ vrf forwarding CustB
+ ip address 12.252.101.5 255.255.255.0
+ ipv6 address 2001:12:252:101::5/64
+!
+interface GigabitEthernet1.516
+ encapsulation dot1Q 516
+ ip address 10.16.0.21 255.255.255.252
+ ipv6 address 2001:10:16::15/126
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ speed 1000
+ no negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+router bgp 101
+ bgp router-id 122.1.1.5
+ !
+ address-family ipv4 vrf CustB
+  neighbor 12.252.100.6 remote-as 600
+  neighbor 12.252.100.6 activate
+  neighbor 12.252.101.7 remote-as 600
+  neighbor 12.252.101.7 activate
+ exit-address-family
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ login
+!
+!
+end

@@ -1,0 +1,181 @@
+
+!
+! Last configuration change at 00:20:54 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 97B6YBUT01O
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$xFIu$OGtcO1NjQrHx.wFJ159pX0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.13 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address ::192:122:3:13/128
+ ospfv3 5 ipv6 area 5
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.113
+ encapsulation dot1Q 113
+ ip address 172.19.113.13 255.255.255.128
+ ip pim bsr-border
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:113::13/64
+ ospfv3 5 ipv6 area 5
+!
+interface GigabitEthernet1.134
+ encapsulation dot1Q 134
+ ip address 172.19.134.13 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:134::13/64
+ ospfv3 5 ipv6 area 5
+!
+interface GigabitEthernet2
+ ip address 192.168.1.13 255.255.255.0
+ negotiation auto
+!
+router ospfv3 5
+ router-id 192.122.3.13
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+router ospf 5
+ router-id 192.122.3.13
+ redistribute eigrp 789 subnets 
+!
+router bgp 651013
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.11 remote-as 651011
+ neighbor 192.122.3.11 ebgp-multihop 255
+ neighbor 192.122.3.11 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv4 multicast
+  redistribute connected
+  neighbor 192.122.3.11 activate
+  neighbor 192.122.3.11 route-map default1 out
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+ip pim bsr-candidate Loopback0 0
+ip pim rp-candidate Loopback0
+no ip http server
+ip http secure-server
+!
+!
+route-map default1 permit 10
+ set ip next-hop 192.122.3.12
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

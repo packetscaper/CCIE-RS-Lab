@@ -1,0 +1,157 @@
+
+!
+! Last configuration change at 03:33:42 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 92D2M7P9WXB
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$3CFZ$arROYO/si4TTNuyW4SQ2I0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.19 255.255.255.255
+ ipv6 address ::192:122:3:19/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.181
+ encapsulation dot1Q 181
+ ip address 172.27.181.19 255.255.255.0
+ ipv6 address 2001:172:27:181::19/64
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ ip address 172.27.192.19 255.255.255.0
+ standby version 2
+ standby 192 ip 172.27.192.254
+ standby 192 preempt
+ standby 192 authentication md5 key-string SERVER_VIP
+ ipv6 address 2001:172:27:192::19/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.19 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface GigabitEthernet1.192
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.27.181.0 0.0.0.255
+  network 172.27.192.0 0.0.0.255
+  network 192.122.3.19 0.0.0.0
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

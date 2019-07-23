@@ -1,0 +1,161 @@
+
+!
+! Last configuration change at 00:20:54 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R20
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+license udi pid CSR1000V sn 9RVSNJLIZK3
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$oHpi$a5vxt0Tr0eJ3M79GQCBFL.
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+track 192 ip sla 10
+!
+ip tcp synwait-time 5
+!
+class-map match-all default
+ match access-group name default
+!
+policy-map default
+ class default
+  police 8000 conform-action drop 
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.20 255.255.255.255
+ ipv6 address ::192:122:3:20/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.182
+ encapsulation dot1Q 182
+ ip address 172.27.182.20 255.255.255.0
+ ipv6 address 2001:172:27:182::20/64
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ ip address 172.27.192.20 255.255.255.0
+ standby version 2
+ standby 192 ip 172.27.192.253
+ standby 192 priority 120
+ standby 192 preempt
+ standby 192 authentication md5 key-string SERVER_VIP
+ standby 192 track 192 decrement 50
+ ipv6 address 2001:172:27:192::20/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.20 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface GigabitEthernet1.192
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.27.182.0 0.0.0.255
+  network 172.27.192.0 0.0.0.255
+  network 192.122.3.20 0.0.0.0
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ip sla 10
+ icmp-echo 192.122.3.18
+ frequency 10
+ip sla schedule 10 life forever start-time now
+!
+!
+control-plane host
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

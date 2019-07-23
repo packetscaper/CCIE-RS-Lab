@@ -1,0 +1,174 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:45:16 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+ip domain name lab.lab
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain HSRP_KEY
+ key 0
+   key-string cisco1
+!
+!
+license udi pid CSR1000V sn 9MWA7QEAAU8
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco password 0 cisco
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+track 10 ip route 172.31.78.0 255.255.255.0 reachability
+!
+crypto key generate rsa modulus 1024
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.10 255.255.255.255
+ ip ospf 1 area 10
+ ipv6 address 2001:10:255:255::10/128
+!
+interface GigabitEthernet1
+ no shutdown
+ standby use-bia
+ negotiation auto
+!
+interface GigabitEthernet1.102
+ encapsulation dot1Q 102
+ ip address 172.30.102.10 255.255.255.0
+ ip pim sparse-mode
+ standby 102 ip 172.30.102.253
+ standby 102 ip 172.30.102.254 secondary
+ standby 102 priority 150
+ standby 102 preempt
+ standby 102 authentication md5 key-chain HSRP_KEY
+ standby 102 track 10 decrement 70
+ ip ospf 1 area 10
+ ipv6 address 2001:172:30:102::10/64
+!
+interface GigabitEthernet1.109
+ encapsulation dot1Q 109
+ ip address 172.30.109.10 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 10
+ ipv6 address 2001:172:30:109::10/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ area 1 stub no-summary
+ area 1 default-cost 1000
+ area 10 nssa
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ login local
+ transport input ssh
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+ntp authentication-key 123 md5 153C3F3C2F7912 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp server 10.255.255.9 key 123
+!
+end

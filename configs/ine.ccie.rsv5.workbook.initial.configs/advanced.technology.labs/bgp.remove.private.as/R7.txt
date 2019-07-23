@@ -1,0 +1,183 @@
+!
+version 15.2
+!
+en
+conf t
+
+Current configuration : 2482 bytes
+!
+! Last configuration change at 23:46:45 UTC Tue May 6 2014
+!
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 150.1.7.7 255.255.255.255
+ ipv6 address 2001:150:7:7::7/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet1.7
+ encapsulation dot1Q 7
+ ip address 155.1.7.7 255.255.255.0
+ ipv6 address 2001:155:1:7::7/64
+!
+interface GigabitEthernet1.37
+ encapsulation dot1Q 37
+ ip address 155.1.37.7 255.255.255.0
+ ipv6 address 2001:155:1:37::7/64
+!
+interface GigabitEthernet1.67
+ encapsulation dot1Q 67
+ ip address 155.1.67.7 255.255.255.0
+ ipv6 address 2001:155:1:67::7/64
+!
+interface GigabitEthernet1.79
+ encapsulation dot1Q 79
+ ip address 155.1.79.7 255.255.255.0
+ ipv6 address 2001:155:1:79::7/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp 100
+ network 150.1.0.0
+ network 155.1.7.7 0.0.0.0
+ network 155.1.37.7 0.0.0.0
+ network 155.1.67.7 0.0.0.0
+ redistribute connected metric 1 1 1 1 1 route-map BGP_NEXT_HOP
+!
+router bgp 300
+ bgp log-neighbor-changes
+ network 155.1.67.0 mask 255.255.255.0
+ aggregate-address 155.1.0.0 255.255.0.0 summary-only
+ neighbor 155.1.37.3 remote-as 200
+ neighbor 155.1.67.6 remote-as 100
+ neighbor 155.1.79.9 remote-as 54
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip community-list expanded AS200 permit 200:[0-9]+_
+ip as-path access-list 1 permit ^$
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list TO_R9 seq 5 permit 155.1.79.0/24
+!
+route-map BGP_NEXT_HOP permit 10
+ match ip address prefix-list TO_R9
+!
+route-map NO_TRANSIT permit 100
+ match as-path 1
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end
+
+R7#
+!
+end

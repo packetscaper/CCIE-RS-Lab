@@ -1,0 +1,174 @@
+
+!
+! Last configuration change at 00:01:57 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R16
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition CustA
+ rd 122.1.1.16:100
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 90Y69TXLGPT
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.16 255.255.255.255
+ ipv6 address 2001:122:1:1::16/128
+!
+interface Loopback1
+ vrf forwarding CustA
+ ip address 192.168.1.16 255.255.255.255
+ ipv6 address 2002:192:168:1::16/128
+!
+interface GigabitEthernet1
+ no shutdown
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet1.316
+ encapsulation dot1Q 316
+ ip address 10.16.0.17 255.255.255.252
+ ipv6 address 2001:10:16::11/126
+!
+interface GigabitEthernet1.416
+ encapsulation dot1Q 416
+ ip address 10.16.0.26 255.255.255.252
+ ipv6 address 2001:10:15::1A/126
+!
+interface GigabitEthernet1.516
+ encapsulation dot1Q 516
+ ip address 10.16.0.22 255.255.255.252
+ ipv6 address 2001:10:15::16/126
+!
+interface GigabitEthernet1.1617
+ encapsulation dot1Q 1617
+ vrf forwarding CustA
+ ip address 172.23.17.16 255.255.255.0
+ ip ospf 2 area 10
+ ipv6 address 2004:172:23:17::16/64
+!
+interface GigabitEthernet1.1618
+ encapsulation dot1Q 1618
+ vrf forwarding CustA
+ ip address 172.23.16.16 255.255.255.0
+ ip ospf 2 area 10
+ ipv6 address 2004:172:23:16::16/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ speed 1000
+ no negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+
+
+
+
+
+
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ login
+!
+!
+end

@@ -1,0 +1,44 @@
+!
+version 15.2
+!
+enable
+configure terminal
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname SW4
+!
+vtp domain CCIE
+vtp mode transparent
+vlan 5,7,8,9,10,22,43,58,67,79,146
+!
+no ip domain-lookup
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+default interface range FastEthernet0/19 - 24
+!
+interface range FastEthernet0/19 - 24
+ no shut
+!
+interface FastEthernet0/19
+ shutdown
+!
+interface FastEthernet0/21
+ shutdown
+!
+interface FastEthernet0/23
+ shutdown
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line vty 0 4
+ no login
+line vty 5 15
+ no login
+!
+end
+

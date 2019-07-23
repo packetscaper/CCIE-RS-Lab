@@ -1,0 +1,42 @@
+!
+version 15.2
+!
+enable
+configure terminal
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname SW1
+!
+vtp domain CCIE
+vtp mode server
+vlan 10,20,30,40,50,60,70,80
+!
+no ip domain-lookup
+spanning-tree mode pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 4096
+!
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface range FastEthernet0/20 - 23
+ shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line vty 0 4
+ no login
+line vty 5 15
+ no login
+!
+end

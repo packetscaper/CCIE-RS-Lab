@@ -1,0 +1,201 @@
+
+!
+! Last configuration change at 03:33:42 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R18
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+!
+username cisco privilege 15 secret 5 $1$o0Cg$friQqIsvBIvZac7UX9pQd1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+class-map match-all default
+ match access-group name default
+!
+policy-map default
+ class default
+  police 8000 conform-action drop 
+!
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key DmvPn!23 address 89.211.116.16  
+crypto isakmp key DmvPn!23 address 89.211.117.17  
+!
+!
+crypto ipsec transform-set TRANSFORM_SET esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set TRANSFORM_SET 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.18 255.255.255.255
+ ipv6 address ::192:122:3:18/128
+!
+interface Tunnel100
+ ip address 172.100.123.18 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPKEY
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 100
+ ip nhrp nhs 172.100.123.18
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1.180
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.180
+ encapsulation dot1Q 180
+ ip address 202.4.180.0 255.255.255.254
+ ipv6 address 2001:202:4:180::/127
+!
+interface GigabitEthernet1.181
+ encapsulation dot1Q 181
+ ip address 172.27.181.18 255.255.255.0
+ ipv6 address 2001:172:27:181::18/64
+!
+interface GigabitEthernet1.182
+ encapsulation dot1Q 182
+ ip address 172.27.182.18 255.255.255.0
+ ipv6 address 2001:172:27:182::18/64
+ service-policy input default
+!
+interface GigabitEthernet2
+ ip address 192.168.1.18 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface Tunnel100
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.27.181.0 0.0.0.255
+  network 172.27.182.0 0.0.0.255
+  network 172.100.123.0 0.0.0.255
+  network 192.122.3.18 0.0.0.0
+ exit-address-family
+!
+router bgp 65456
+ bgp log-neighbor-changes
+ network 202.4.180.0 mask 255.255.255.254
+ neighbor 202.4.180.1 remote-as 65123
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ip access-list extended default
+ permit icmp 172.27.182.0 0.0.0.255 host 192.122.3.18 echo
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

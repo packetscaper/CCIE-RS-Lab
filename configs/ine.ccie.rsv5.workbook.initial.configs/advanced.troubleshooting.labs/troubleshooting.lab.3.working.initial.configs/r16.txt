@@ -1,0 +1,231 @@
+
+!
+! Last configuration change at 03:32:24 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R16
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-2333432108
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2333432108
+ revocation-check none
+ rsakeypair TP-self-signed-2333432108
+!
+!
+crypto pki certificate chain TP-self-signed-2333432108
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 32333333 34333231 3038301E 170D3134 31303232 30303330 
+  32325A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 33333334 
+  33323130 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100985A 0C587431 72537B9A 48FFC0F7 B1FB203A C9D9EF67 32CB8174 26771B9D 
+  9EC1D557 AD10D078 67692552 3B219B99 CDF925F4 4A8D05F3 1BBC5049 C5330A5C 
+  BE2D440F 2C55BE33 DBA61AC7 0AA6B22E 117366E7 D4FA8391 EB33FD19 9738875C 
+  437A6345 08D9B099 0CFA04D8 C385A116 43BEC8AC 30F6A592 60865DD6 C25E33E9 
+  E2D10203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 1429E5D0 3128F37E 2731207A 1656263A E1CB3F23 D8301D06 
+  03551D0E 04160414 29E5D031 28F37E27 31207A16 56263AE1 CB3F23D8 300D0609 
+  2A864886 F70D0101 05050003 81810073 3B2AA4C0 C8791697 B6AE4A63 BCDFAF62 
+  1A2C5DAC 93D25681 800F1E9F E9BA5935 E141085F B17DF7A0 DF2B379E 7D7B302E 
+  BACBA0BC C10AAB23 13F33AF6 93E83FB6 FEEDAFF6 A144C7CC 751B402D 550BF1E4 
+  7651C3F5 AE1DA296 11BBDBAA 76FEA2EA 0C4B440D AA8CB270 798BAAA2 71773715 
+  28A0F610 336B0E69 102E3DC9 1E9FA4
+  	quit
+license udi pid CSR1000V sn 90Y69TXLGPT
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$1EVq$/stT3SQkkkdPv.z.52dEw0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key DmvPn!23 address 89.211.117.17  
+crypto isakmp key DmvPn!23 address 202.4.180.0    
+!
+!
+crypto ipsec transform-set TRANSFORM_SET esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set TRANSFORM_SET 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.16 255.255.255.255
+ ipv6 address ::192:122:3:16/128
+!
+interface Tunnel100
+ ip address 172.100.123.16 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPKEY
+ ip nhrp map 172.100.123.18 202.4.180.0
+ ip nhrp map multicast 202.4.180.0
+ ip nhrp network-id 100
+ ip nhrp nhs 172.100.123.18
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1.116
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.16 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:89:211:116::16/125
+ ipv6 dhcp client pd SITE_F
+!
+interface GigabitEthernet1.160
+ encapsulation dot1Q 160
+ ip address 172.23.160.16 255.255.255.0
+ ipv6 address SITE_F ::16/64
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 202.4.216.16 255.255.255.192
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:202:4:216::16/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.16 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface GigabitEthernet1.160
+   summary-address 172.0.0.0 255.0.0.0
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.23.160.0 0.0.0.255
+  network 172.100.123.0 0.0.0.255
+  eigrp stub connected summary redistributed
+ exit-address-family
+!
+router ospf 100
+ router-id 192.122.3.16
+ max-lsa 1000
+ fast-reroute per-prefix enable prefix-priority low
+ area 121 nssa
+ redistribute connected subnets route-map CONNECTED_INTO_OSPF
+ mpls ldp autoconfig
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface Loopback0
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

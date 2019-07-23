@@ -1,0 +1,49 @@
+router eigrp 100
+
+{%for subinterface in subinterfaces%}
+
+{%if subinterface.subint !=100%}
+network 155.1.{{subinterface.subint}}.{{id}} 0.0.0.0
+{%endif%}
+{% endfor %}
+
+
+
+{% if id == 1 or id == 2 or id == 3 or id ==5 %}
+
+network 155.1.0.{{id}} 0.0.0.0
+interface Tunnel0
+ no ip split-horizon eigrp 100
+
+{% endif %}
+
+
+router bgp {{AS}}
+network 150.1.{{id}}.{{id}} mask 255.255.255.255
+{% for neighbor in BGP.neighbors %}
+
+neighbor {{neighbor.neighbor}} remote-as {{neighbor.AS}}
+
+{% endfor %}
+
+{% if BGP.RR_clients is defined %}
+
+{% for RR_client in BGP.RR_clients %}
+neighbor {{RR_client}} route-reflector-client 
+
+{% endfor %}
+
+{% endif %}
+
+
+{% if id == 9 or id == 10%}
+
+interface Ethernet0/0.109
+encapsulation dot1q 109
+ip address 155.1.109.{{id}} 255.255.255.0
+ 
+router eigrp 100
+network 155.1.109.{{id}} 0.0.0.0 
+
+ 
+{%endif%}

@@ -1,0 +1,214 @@
+
+!
+! Last configuration change at 03:32:24 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp neighbor 192.122.3.6 password CC!E_!nE
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 9ORST0AKGHD
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$4d3Y$blN1ys3MQhPaEc2E9DVx0/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.5 255.255.255.255
+ ipv6 address ::192:122:3:5/128
+ ipv6 rip CCIE enable
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.0.35.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:35::2/126
+ ipv6 rip CCIE enable
+ ipv6 traffic-filter test in
+ mpls ip
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 10.0.45.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:45::2/126
+ ipv6 rip CCIE enable
+ mpls ip
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.0.56.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:56::1/126
+ ipv6 rip CCIE enable
+ mpls ip
+!
+interface GigabitEthernet1.58
+ encapsulation dot1Q 58
+ ip address 136.6.58.5 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:6:58::5/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.5 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  topology base
+   redistribute rip metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 136.6.58.0 0.0.0.255
+  metric weights 0 0 0 1 0 0 0
+ exit-address-family
+!
+router rip
+ version 2
+ redistribute eigrp 56 metric 1 route-map EIGRP_INTO_RIP_REDISTRIBUTION
+ passive-interface default
+ no passive-interface GigabitEthernet1.35
+ no passive-interface GigabitEthernet1.45
+ no passive-interface GigabitEthernet1.56
+ network 10.0.0.0
+ network 192.122.3.0
+ no auto-summary
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor ::192:122:3:6 remote-as 65006
+ neighbor ::192:122:3:6 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor ::192:122:3:6 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ipv6 route ::192:122:3:66/128 Null0
+ipv6 router rip CCIE
+ timers 10 30 30 40
+!
+!
+route-map EIGRP_INTO_RIP_REDISTRIBUTION permit 10
+ set tag 590
+!
+mpls ldp router-id Loopback0 force
+!
+!
+ipv6 access-list test
+ deny tcp any eq bgp any
+ deny tcp any any eq bgp
+ permit ipv6 any any
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

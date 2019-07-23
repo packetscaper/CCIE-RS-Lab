@@ -1,0 +1,153 @@
+
+!
+! Last configuration change at 00:19:47 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition FVRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$pBo.$oz8m76Ldq9KvAcq3bdWnG/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 95OSJ0DCRXR
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.6 255.255.255.255
+ ipv6 address 2001:172:16:1::6/128
+!
+interface Tunnel0
+ ip address 180.10.254.6 255.255.255.0
+ 
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.610
+ encapsulation dot1Q 610
+ vrf forwarding FVRF
+ ip address 44.2.5.5 255.255.255.254
+ ipv6 address 2001:44:2:5::5/127
+!
+interface GigabitEthernet1.618
+ encapsulation dot1Q 618
+ ip address 180.10.186.0 255.255.255.254
+ ipv6 address 2001:180:10:186::/127
+!
+interface GigabitEthernet1.678
+ encapsulation dot1Q 678
+ ip address 180.10.123.6 255.255.255.128
+ ipv6 address 2001:180:10:123::6/65
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

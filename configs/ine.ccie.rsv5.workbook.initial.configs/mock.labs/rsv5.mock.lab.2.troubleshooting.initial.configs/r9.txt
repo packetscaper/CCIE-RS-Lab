@@ -1,0 +1,222 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:45:16 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service sequence-numbers
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R9
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 989PI5Z8M4J
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+class-map match-all VOIP
+ match dscp ef 
+class-map match-all VOIP_SIGNALING
+ match protocol ssh
+class-map match-any TRANSACTIONAL_BULK
+ match dscp af11 
+ match dscp af21 
+!
+policy-map CHILD_QUEUING
+ class VOIP
+  priority 10000
+ class VOIP_SIGNALING
+  bandwidth 10000
+  police cir 10000 conform-action drop  exceed-action drop 
+ class TRANSACTIONAL_BULK
+  bandwidth 30000
+  random-detect dscp-based
+ class class-default
+policy-map SHAPE_VPN
+ class class-default
+  shape average 50000000
+   service-policy CHILD_QUEUING
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.9 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 1 area 10
+ ipv6 address 2001:10:255:255::9/128
+!
+interface Tunnel79
+ ip unnumbered Loopback0
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.7
+!
+interface Tunnel89
+ ip unnumbered Loopback0
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.8
+!
+interface Tunnel915
+ ip unnumbered Loopback0
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.15
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.49
+ encapsulation dot1Q 49
+ ip address 172.30.49.9 255.255.255.0
+ ip verify unicast source reachable-via rx
+ ip access-group LOG_HTTP_SYN in
+ ip ospf 1 area 0
+ ipv6 address 2001:172:30:49::9/64
+ service-policy output SHAPE_VPN
+!
+interface GigabitEthernet1.102
+!
+interface GigabitEthernet1.109
+ encapsulation dot1Q 109
+ ip address 172.30.109.9 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 10
+ ipv6 address 2001:172:30:109::9/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ area 10 nssa
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip access-list log-update threshold 10
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip pim send-rp-announce Loopback0 scope 255 interval 5
+ip pim send-rp-discovery Loopback0 scope 255 interval 5
+no ip http server
+no ip http secure-server
+!
+ip access-list extended LOG_HTTP_SYN
+ permit tcp 10.0.0.0 0.255.255.255 host 172.30.102.100 eq www
+ permit tcp 172.16.0.0 0.15.255.255 host 172.30.102.100 eq www
+ permit tcp 192.168.0.0 0.0.255.255 host 172.30.102.100 eq www
+ permit tcp any host 172.30.102.100 eq www syn log-input
+ permit ip any any
+!
+logging host 172.30.102.200
+access-list 10 permit 10.255.255.8
+access-list 10 permit 10.255.255.13
+access-list 20 permit 10.255.255.10
+access-list 20 permit 10.255.255.11
+access-list 20 permit 10.255.255.12
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+ntp authentication-key 123 md5 12373127395835 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp access-group peer 10
+ntp access-group serve-only 20
+ntp master 3
+ntp peer 10.255.255.8 key 123
+!
+end

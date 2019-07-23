@@ -1,0 +1,208 @@
+
+!
+! Last configuration change at 01:32:03 UTC Sun Aug 10 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+enable secret 5 $1$2oP4$8gzhSDlM7puiZb3wzXT7L0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.5 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 2 area 34
+ ipv6 address 2001:172:16:1::5/128
+ ospfv3 1 ipv6 area 34
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::5/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 180.10.35.5 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 34
+ ipv6 address 2001:180:10:35::5/64
+ ospfv3 1 ipv6 area 34
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 180.10.45.5 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 34
+ ipv6 address 2001:180:10:45::5/64
+ ospfv3 1 ipv6 area 34
+!
+interface GigabitEthernet1.105
+ encapsulation dot1Q 105
+ ip address 180.10.105.5 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ipv6 address 2001:180:10:105::5/64
+ ipv6 rip RIPng enable
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+
+!
+router ospfv3 1
+ !
+ address-family ipv6 unicast
+  redistribute rip RIPng tag 34 include-connected
+  area 34 stub
+ exit-address-family
+!
+router ospf 1
+ router-id 172.16.1.5
+ ispf
+ no log-adjacency-changes
+ auto-cost reference-bandwidth 100000
+ prefix-suppression
+ area 34 nssa
+ redistribute rip subnets route-map subnets
+!
+router ospf 2
+!
+router rip
+ version 2
+ passive-interface default
+ no passive-interface GigabitEthernet1.105
+ network 172.16.0.0
+ network 180.10.0.0
+ default-information originate
+ no auto-summary
+!
+router bgp 6618605
+ bgp log-neighbor-changes
+ neighbor 2001:172:16:1::16 remote-as 6618605
+ neighbor 2001:172:16:1::16 password CC1E_PASS
+ neighbor 2001:172:16:1::16 update-source Loopback0
+ !
+ address-family ipv4
+  no neighbor 2001:172:16:1::16 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:192:168:1::5/128
+  neighbor 2001:172:16:1::16 activate
+  neighbor 2001:172:16:1::16 send-community both
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list rip-subs seq 5 permit 180.1.100.100/32
+ipv6 router rip RIPng
+ redistribute ospf 1 metric 2 include-connected
+!
+!
+route-map subnets permit 1000
+ match ip address prefix-list rip-subs
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

@@ -1,0 +1,401 @@
+enable
+configure terminal
+
+! Current configuration : 9185 bytes
+!
+! Last configuration change at 17:46:27 UTC Wed Oct 8 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition ISPB
+ rd 10000:10000
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9RIGE0C5F9C
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.12 255.255.255.255
+ ipv6 address 2001:10:255:255::12/128
+!
+interface Loopback10001
+ vrf forwarding ISPB
+ ip address 216.247.177.247 255.192.0.0
+ ipv6 address 2001:F48B:84C0:8C4E:A61C:C3A2:41D1:FA87/29
+!
+interface Loopback10002
+ vrf forwarding ISPB
+ ip address 93.1.136.33 252.0.0.0
+ ipv6 address 2001:2740:D973:7F37:43EC:38C7:987E:BFFE/27
+!
+interface Loopback10003
+ vrf forwarding ISPB
+ ip address 167.77.35.158 255.255.192.0
+ ipv6 address 2001:49E4:1276:EA91:87D6:5117:E273:6D4D/62
+!
+interface Loopback10004
+ vrf forwarding ISPB
+ ip address 17.205.3.152 255.255.0.0
+ ipv6 address 2001:BF8D:4293:BAA8:EE02:762C:87C2:1F27/29
+!
+interface Loopback10005
+ vrf forwarding ISPB
+ ip address 200.93.109.69 255.255.252.0
+ ipv6 address 2001:3CA2:AC24:E9CA:494B:CBE:73CB:596D/20
+ ipv6 address 2001:4ED9:A856:425:855:D0EC:9C97:CE47/24
+!
+interface Loopback10006
+ vrf forwarding ISPB
+ ip address 40.44.33.42 255.255.0.0
+ ipv6 address 2001:C10B:2BC0:4FC8:E282:70BC:96D0:8736/28
+!
+interface Loopback10007
+ vrf forwarding ISPB
+ ip address 70.158.90.2 255.255.255.240
+ ipv6 address 2001:B945:DCF3:5522:3521:F9FD:D6BA:E947/59
+!
+interface Loopback10008
+ vrf forwarding ISPB
+ ip address 149.72.115.116 254.0.0.0
+ ipv6 address 2001:F34F:4F7E:F785:E77C:2334:DA9:B2E6/40
+!
+interface Loopback10009
+ vrf forwarding ISPB
+ ip address 52.133.177.107 255.224.0.0
+ ipv6 address 2001:CE1:67B0:65F3:5A18:F13E:9B4C:D2E9/25
+!
+interface Loopback10010
+ vrf forwarding ISPB
+ ip address 80.85.21.152 254.0.0.0
+ ipv6 address 2001:2A0F:251B:182D:4294:28F4:B0BB:448E/56
+ ipv6 address 2001:B58A:DB57:9EFB:CE95:1B6F:EF64:3901/33
+!
+interface Loopback10011
+ no ip address
+ ipv6 address 2001:AB19:7059:2F88:8557:4DFA:903C:90FC/58
+!
+interface Loopback10012
+ vrf forwarding ISPB
+ ip address 174.205.109.242 254.0.0.0
+ ipv6 address 2001:796E:5912:E1D1:CE4B:1C06:A265:E2CE/58
+!
+interface Loopback10013
+ vrf forwarding ISPB
+ ip address 113.104.115.55 255.255.255.192
+ ipv6 address 2001:DF1B:7AE:F635:9046:1A10:11F:6F94/42
+!
+interface Loopback10014
+ vrf forwarding ISPB
+ ip address 52.48.216.43 255.255.255.240
+ ipv6 address 2001:ED67:85BA:C1BA:FFB3:E6C6:5C68:B60E/46
+!
+interface Loopback10015
+ vrf forwarding ISPB
+ ip address 66.154.108.147 255.224.0.0
+ ipv6 address 2001:6C89:B369:2C7F:60CA:794D:CD35:CD21/44
+ ipv6 address 2001:D849:38D2:6620:D2CA:3139:98AF:5663/50
+!
+interface Loopback10016
+ vrf forwarding ISPB
+ ip address 4.167.253.112 255.192.0.0
+ ipv6 address 2001:913D:A748:E377:430E:71D2:B079:229D/37
+!
+interface Loopback10017
+ vrf forwarding ISPB
+ ip address 19.53.80.83 255.255.128.0
+ ipv6 address 2001:23F4:48C4:6C44:2965:84AF:2914:EF1E/30
+!
+interface Loopback10018
+ vrf forwarding ISPB
+ ip address 183.3.97.68 255.255.255.224
+ ipv6 address 2001:624C:9888:405E:F260:E9E:AE2A:9A7C/49
+!
+interface Loopback10019
+ vrf forwarding ISPB
+ ip address 184.253.191.167 255.192.0.0
+ ipv6 address 2001:9E8D:891E:42DF:34DC:42C5:8F2A:7B63/52
+!
+interface Loopback10020
+ vrf forwarding ISPB
+ ip address 57.198.115.154 255.255.255.254
+ ipv6 address 2001:2A9C:880B:D0B0:5E8B:267E:3007:A08/38
+ ipv6 address 2001:7766:1FC:4177:172:ACEB:E9C4:C27C/48
+ ipv6 address 2001:C8DE:ECE7:AA06:E6D0:E185:9045:FD5B/21
+!
+interface Loopback10021
+ vrf forwarding ISPB
+ ip address 165.186.47.248 255.255.240.0
+ ipv6 address 2001:EC35:19CF:5D10:F362:3BAF:792D:C8C1/37
+!
+interface Loopback10022
+ vrf forwarding ISPB
+ ip address 102.109.149.225 255.255.252.0
+ ipv6 address 2001:E61E:2C22:5780:CD7E:895A:A4DC:A65A/54
+!
+interface Loopback10023
+ vrf forwarding ISPB
+ ip address 135.55.145.238 255.255.254.0
+ ipv6 address 2001:55B5:1B4D:44CA:4CC5:2146:63B1:1E9B/31
+!
+interface Loopback10024
+ vrf forwarding ISPB
+ ip address 84.211.68.138 255.240.0.0
+ ipv6 address 2001:83CC:F81C:8462:69B2:3566:E469:4DAF/31
+!
+interface Loopback10025
+ vrf forwarding ISPB
+ ip address 57.34.56.36 255.248.0.0
+ ipv6 address 2001:7022:E2F4:7514:A540:8253:7287:42E3/29
+ ipv6 address 2001:BB82:C11B:3EFE:A4AF:4F2D:3029:E42D/60
+!
+interface Loopback10026
+ vrf forwarding ISPB
+ ip address 102.93.197.210 255.255.255.252
+ ipv6 address 2001:C291:2F25:273B:9BDB:8579:F9F7:60FA/60
+!
+interface Loopback10027
+ vrf forwarding ISPB
+ ip address 222.219.39.70 255.252.0.0
+ ipv6 address 2001:5B8:3E6C:27A5:CE0A:569B:B8B:BAD6/44
+!
+interface Loopback10028
+ vrf forwarding ISPB
+ ip address 118.84.115.167 254.0.0.0
+ ipv6 address 2001:986E:A93E:9448:42EF:74FE:F5AD:D507/25
+!
+interface Loopback10029
+ vrf forwarding ISPB
+ ip address 173.6.123.162 255.128.0.0
+ ipv6 address 2001:B391:4C05:8E7:447C:2735:1BDB:DB7B/59
+!
+interface Loopback10030
+ vrf forwarding ISPB
+ ip address 8.59.16.62 255.128.0.0
+ ipv6 address 2001:A4F1:3F9A:A171:61EE:8172:ADF8:D3EE/24
+!
+interface Loopback10031
+ no ip address
+ ipv6 address 2001:1C99:5914:34D8:77FE:E1FD:2DB5:B1DB/21
+!
+interface Loopback10032
+ vrf forwarding ISPB
+ ip address 210.52.35.6 255.240.0.0
+ ipv6 address 2001:7279:926D:8F95:E823:D182:17B1:6EEC/41
+!
+interface Loopback10033
+ vrf forwarding ISPB
+ ip address 10.247.85.46 255.192.0.0
+ ipv6 address 2001:6417:65A6:990F:17C3:1535:4BFC:95F2/44
+!
+interface Loopback10034
+ vrf forwarding ISPB
+ ip address 198.196.221.106 255.255.255.240
+ ipv6 address 2001:8FCA:4EDB:13E2:2CE9:6481:673E:5C43/26
+!
+interface Loopback10035
+ vrf forwarding ISPB
+ ip address 56.73.234.35 255.240.0.0
+ ipv6 address 2001:DB00:7888:4BC1:69BE:6A1B:5262:A50F/54
+!
+interface Loopback10036
+ vrf forwarding ISPB
+ ip address 37.235.21.254 255.0.0.0
+ ipv6 address 2001:77BE:AA13:D0A:E5CD:9C90:D08:75BB/40
+ ipv6 address 2001:A784:211A:4B60:C20D:3BFC:24F4:263E/51
+!
+interface Loopback10037
+ vrf forwarding ISPB
+ ip address 55.8.14.226 255.248.0.0
+ ipv6 address 2001:A15:B9A6:9D8F:5110:17C0:3EB7:632A/40
+!
+interface Loopback10038
+ vrf forwarding ISPB
+ ip address 77.245.222.117 255.255.255.240
+ ipv6 address 2001:2028:143B:1C10:7043:596D:3DA1:3B7/53
+!
+interface Loopback10039
+ vrf forwarding ISPB
+ ip address 32.121.114.215 255.255.0.0
+ ipv6 address 2001:6E5B:3608:5FF1:373:427A:899E:2640/27
+!
+interface Loopback10040
+ vrf forwarding ISPB
+ ip address 137.230.242.158 255.255.254.0
+ ipv6 address 2001:ACA:3AC4:3476:2F9D:D888:6E8B:9FCA/63
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ vrf forwarding ISPB
+ ip address 169.254.60.1 255.255.255.254
+ ipv6 address 2001:169:254:60::1/127
+!
+interface GigabitEthernet1.102
+ encapsulation dot1Q 102
+ ip address 172.30.102.12 255.255.255.0
+ ipv6 address 2001:172:30:102::12/64
+!
+interface GigabitEthernet1.181
+ encapsulation dot1Q 181
+ vrf forwarding ISPB
+ ip address 169.254.181.1 255.255.255.254
+ ipv6 address 2001:169:254:181::1/127
+!
+interface GigabitEthernet1.190
+ encapsulation dot1Q 190
+ vrf forwarding ISPB
+ ip address 169.254.190.1 255.255.255.254
+ ipv6 address 2001:169:254:190::1/127
+!
+interface GigabitEthernet1.200
+ encapsulation dot1Q 200
+ vrf forwarding ISPB
+ ip address 169.254.200.1 255.255.255.254
+ ipv6 address 2001:169:254:200::1/127
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 30000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ !
+ address-family ipv4 vrf ISPB
+  redistribute connected route-map IPV4_CONNECTED
+  neighbor 169.254.60.0 remote-as 1.20000
+  neighbor 169.254.60.0 activate
+  neighbor 169.254.181.0 remote-as 1832
+  neighbor 169.254.181.0 activate
+  neighbor 169.254.190.0 remote-as 1833
+  neighbor 169.254.190.0 activate
+  neighbor 169.254.200.0 remote-as 1834
+  neighbor 169.254.200.0 activate
+ exit-address-family
+ !
+ address-family ipv6 vrf ISPB
+  redistribute connected route-map IPV6_CONNECTED
+  neighbor 2001:169:254:60:: remote-as 1.20000
+  neighbor 2001:169:254:60:: activate
+  neighbor 2001:169:254:181:: remote-as 1832
+  neighbor 2001:169:254:181:: activate
+  neighbor 2001:169:254:190:: remote-as 1833
+  neighbor 2001:169:254:190:: activate
+  neighbor 2001:169:254:200:: remote-as 1834
+  neighbor 2001:169:254:200:: activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list 169 seq 5 permit 169.254.0.0/16 ge 31 le 31
+!
+!
+ipv6 prefix-list 2001:169:254 seq 5 permit 2001:169:254::/48 ge 127 le 127
+route-map IPV6_CONNECTED deny 10
+ match ipv6 address prefix-list 2001:169:254
+!
+route-map IPV6_CONNECTED permit 20
+!
+route-map IPV4_CONNECTED deny 10
+ match ip address prefix-list 169
+!
+route-map IPV4_CONNECTED permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R12#

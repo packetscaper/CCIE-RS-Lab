@@ -1,0 +1,220 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R16
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 90Y69TXLGPT
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+track 1 ip sla 1
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr 3des
+ authentication pre-share
+ group 5
+crypto isakmp key DMVPNPASS address 0.0.0.0
+!
+!
+crypto ipsec transform-set ESP-AES-128-MD5 esp-aes esp-md5-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP-AES-128-MD5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.16 255.255.255.255
+ ipv6 address 2001:10:255:255::16/128
+!
+interface Loopback1
+ ip address 10.255.255.60 255.255.255.255
+!
+interface Tunnel1
+ ip address 183.100.1.16 255.255.255.0
+ no ip redirects
+ ip nhrp authentication DMVPN1
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 1
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.160
+ encapsulation dot1Q 160
+ ip address 169.254.160.0 255.255.255.254
+ ipv6 address 2001:169:254:160::/127
+!
+interface GigabitEthernet1.1623
+ encapsulation dot1Q 1623
+ ip address 183.16.23.16 255.255.255.0
+ ipv6 address 2001:183:16:23::16/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp SITE_W
+ !
+ address-family ipv4 unicast autonomous-system 1831
+  !
+  af-interface Tunnel1
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 1831
+  !
+  af-interface GigabitEthernet1.160
+   shutdown
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router bgp 1831
+ bgp log-neighbor-changes
+ neighbor 169.254.160.1 remote-as 10000
+ !
+ address-family ipv4
+  bgp scan-time 5
+  network 10.255.255.16 mask 255.255.255.255
+  network 10.255.255.60 mask 255.255.255.255
+  neighbor 169.254.160.1 activate
+  neighbor 169.254.160.1 advertise-map am non-exist-map nem
+  neighbor 169.254.160.1 advertisement-interval 0
+ exit-address-family
+!
+ip prefix-list 18 seq 5 permit 10.255.255.18/32
+!
+ip prefix-list 60 seq 5 permit 10.255.255.60/32
+!
+route-map am permit 10
+ match ip address prefix-list 60
+!
+route-map nem permit 10
+ match ip address prefix-list 18
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route 16.16.16.16 255.255.255.255 Null0 track 1
+!
+ip sla 1
+ icmp-echo 2001:183:17:23::17 source-interface GigabitEthernet1.1623
+ frequency 5
+ip sla schedule 1 life forever start-time now
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

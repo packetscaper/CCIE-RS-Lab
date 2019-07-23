@@ -1,0 +1,174 @@
+
+!
+! Last configuration change at 22:59:57 UTC Thu Sep 18 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-3368683514
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3368683514
+ revocation-check none
+ rsakeypair TP-self-signed-3368683514
+!
+!
+crypto pki certificate chain TP-self-signed-3368683514
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33333638 36383335 3134301E 170D3134 30383037 30303136 
+  35315A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 33363836 
+  38333531 3430819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  810094AB E5CFDBDE 5B6E6678 8C9675A4 1FAF26BC 6A70BEE6 178F7561 580DCEE6 
+  94C85B74 707CF37E DA7712E7 63AA6AAB 64FC5421 97D84851 2DD126AC 09F7A947 
+  11C597EF 2783A5A6 DF23E7B3 FD3A3429 89B146FD D794BD81 78C0A309 BA6C59D8 
+  1CBD6737 E7E17E4A C96F058E C232A762 AD81128A 67C892BF 2B878AFE 7330900D 
+  C6010203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 140D993F 22652C00 F4446D75 51B80C8D 59C2EA0D AE301D06 
+  03551D0E 04160414 0D993F22 652C00F4 446D7551 B80C8D59 C2EA0DAE 300D0609 
+  2A864886 F70D0101 05050003 81810081 62EA1F6E 02E99194 27B56613 F609F0C4 
+  AE707BFA 440E2026 6177CBA2 F9878424 88008CE1 EBE3FB9E E1B6F9B5 DF31D6D3 
+  B401EFDC A1E94B2F 05E7756B 504A26A4 46576B93 B49F6EE8 129713F7 6E9196CF 
+  F98AF99E F5B5B29A 08E83BD9 4E7CE67B 9D0C59CB 6F7D7F4B 6C6B332B 3DC214C1 
+  02233FA6 5E85AE2C 122F120B 6F0155
+  	quit
+license udi pid CSR1000V sn 9O1KOE672K8
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$G5Qe$sRxaEA1nsfl/CvdVPsY3r.
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.8 255.255.255.255
+ ipv6 address ::192:122:3:6/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.8 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:18::8/64
+!
+interface GigabitEthernet1.58
+ encapsulation dot1Q 58
+ ip address 136.6.58.8 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:6:58::8/64
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.30.78.8 255.255.255.224
+ ip pim sparse-mode
+ ipv6 address 2001:172:30:78::8/120
+!
+interface GigabitEthernet1.89
+ encapsulation dot1Q 89
+ ip address 172.30.89.8 255.255.255.224
+ ipv6 address 2001:172:30:89::8/120
+!
+interface GigabitEthernet2
+ ip address 192.168.1.8 255.255.255.0
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

@@ -1,0 +1,155 @@
+
+!
+! Last configuration change at 00:01:55 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9MWA7QEAAU8
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+crypto isakmp key CISCO address 122.1.1.18     
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.10 255.255.255.255
+ ipv6 address 2001:122:1:1::10/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ ip address 10.245.1.1 255.255.255.254
+ ipv6 address 2001:10:245:1::1/127
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 10.245.2.5 255.255.255.254
+ ipv6 address 2001:10:245:2::5/127
+!
+interface GigabitEthernet1.1015
+ encapsulation dot1Q 1015
+ ip address 10.245.2.8 255.255.255.254
+ ipv6 address 2001:10:245:2::8/127
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ login
+ rotary 1
+line vty 6 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

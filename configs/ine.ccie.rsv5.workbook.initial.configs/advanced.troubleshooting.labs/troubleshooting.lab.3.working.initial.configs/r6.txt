@@ -1,0 +1,244 @@
+
+!
+! Last configuration change at 03:32:24 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required
+mpls ldp neighbor 192.122.3.3 password CC!E_!nE
+mpls ldp neighbor 192.122.3.4 password CC!E_!nE
+mpls ldp neighbor 192.122.3.5 password CC!E_!nE
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 95OSJ0DCRXR
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$eF1d$RtoVvxulLL30InAq01r0F1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.6 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 226.10.6.6
+ ipv6 address ::192:122:3:6/128
+ ipv6 rip CCIE enable
+!
+interface Tunnel64
+ no ip address
+ ipv6 address 2001:10:0:360::2/126
+ ipv6 rip CCIE enable
+ tunnel source 2001:10:0:36::2
+ tunnel mode ipv6
+ tunnel destination 2001:10:0:36::1
+ tunnel path-mtu-discovery
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.0.36.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:36::2/126
+ ipv6 rip CCIE enable
+ mpls ip
+!
+interface GigabitEthernet1.46
+ encapsulation dot1Q 46
+ ip address 10.0.46.2 255.255.255.252
+ ip broadcast-address 10.0.46.3
+ ip pim sparse-mode
+ ip rip v2-broadcast
+ ipv6 address 2001:10:0:46::2/126
+ ipv6 rip CCIE enable
+ mpls ip
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.0.56.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:56::2/126
+ ipv6 rip CCIE enable
+ mpls ip
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 202.4.60.0 255.255.255.254
+ ip pim bsr-border
+ ip pim sparse-mode
+ ipv6 address 2001:202:4:60::/127
+!
+interface GigabitEthernet2
+ ip address 192.168.1.6 255.255.255.0
+ negotiation auto
+!
+router rip
+ version 2
+ redistribute connected route-map CONNECTED_INTO_RIP
+ redistribute bgp 65006 metric 1 route-map BGP_INTO_RIP_REDISTRIBUTION
+ passive-interface default
+ no passive-interface GigabitEthernet1.36
+ no passive-interface GigabitEthernet1.46
+ no passive-interface GigabitEthernet1.56
+ network 10.0.0.0
+ no auto-summary
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor IPv6_BGP peer-group
+ neighbor IPv6_BGP remote-as 65006
+ neighbor IPv6_BGP update-source Loopback0
+ neighbor ::192:122:3:3 peer-group IPv6_BGP
+ neighbor ::192:122:3:4 peer-group IPv6_BGP
+ neighbor ::192:122:3:5 peer-group IPv6_BGP
+ neighbor 2001:202:4:60::1 remote-as 65123
+ neighbor 2001:202:4:60::1 local-as 65600 no-prepend replace-as
+ neighbor 202.4.60.1 remote-as 65123
+ neighbor FE80::1%GigabitEthernet1.60 remote-as 100
+ !
+ address-family ipv4
+  network 89.211.116.0 mask 255.255.255.128
+  network 89.211.117.0 mask 255.255.255.128
+  neighbor 202.4.60.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network ::192:122:3:3/128
+  network ::192:122:3:4/128
+  network ::192:122:3:5/128
+  network ::192:122:3:6/128
+  neighbor IPv6_BGP route-reflector-client
+  neighbor IPv6_BGP next-hop-self
+  neighbor IPv6_BGP route-map ipv6-policy out
+  neighbor ::192:122:3:3 activate
+  neighbor ::192:122:3:4 activate
+  neighbor ::192:122:3:5 activate
+  neighbor 2001:202:4:60::1 activate
+  neighbor 2001:202:4:60::1 send-community both
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+ip community-list 1 permit 65123:1
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list R18_UNDERLAY_CONNECTIVITY seq 5 permit 202.4.180.0/31
+ipv6 router rip CCIE
+ timers 10 30 30 40
+!
+!
+route-map CONNECTED_INTO_RIP permit 10
+ match interface Loopback0
+ set metric 6
+!
+route-map BGP_INTO_RIP_REDISTRIBUTION permit 10
+ match ip address prefix-list R18_UNDERLAY_CONNECTIVITY
+!
+route-map ipv6-policy permit 10
+ match community 1
+ set ipv6 next-hop ::192:122:3:6
+!
+route-map ipv6-policy permit 20
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

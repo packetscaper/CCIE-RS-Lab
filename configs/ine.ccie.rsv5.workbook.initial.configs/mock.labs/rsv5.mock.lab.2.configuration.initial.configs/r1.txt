@@ -1,0 +1,168 @@
+
+!
+! Last configuration change at 00:16:52 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging discriminator a facility drops NHRP|QOS|Priority 
+enable secret 5 $1$YeQ2$I4qeist9jzw7KzVSv1R1F.
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 92HVO0PSL3U
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.1 255.255.255.255
+ ipv6 address 2001:172:16:1::1/128
+!
+interface Tunnel0
+ ip address 180.10.254.1 255.255.255.0
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::1/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 180.10.12.1 255.255.255.0
+ ip pim sparse-mode
+ 
+ ipv6 address 2001:180:10:12::1/64
+ ipv6 mtu 1500
+ 
+ 
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 180.10.13.1 255.255.255.0
+ ipv6 address 2001:180:10:13::1/64
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ ip address 44.2.5.1 255.255.255.254
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+ ipv6 address 2001:44:2:5::1/127
+!
+interface GigabitEthernet1.114
+ encapsulation dot1Q 114
+ ip address 180.10.114.1 255.255.255.0
+ 
+ ipv6 address 2001:180:10:114::1/64
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 180.10.116.1 255.255.255.0
+ ipv6 address 2001:180:10:116::1/64
+ 
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

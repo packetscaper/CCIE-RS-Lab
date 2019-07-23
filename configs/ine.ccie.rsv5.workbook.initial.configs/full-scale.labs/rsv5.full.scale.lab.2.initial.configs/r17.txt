@@ -1,0 +1,135 @@
+enable
+configure terminal
+
+! Current configuration : 1254 bytes
+!
+! Last configuration change at 20:37:16 UTC Tue Oct 7 2014
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9ZKEEWZ6S6H
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.17 255.255.255.255
+ ipv6 address 2001:10:255:255::17/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ ip address 169.254.170.0 255.255.255.254
+ ipv6 address 2001:169:254:170::/127
+!
+interface GigabitEthernet1.1723
+ encapsulation dot1Q 1723
+ ip address 183.17.23.17 255.255.255.0
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+router eigrp SITE_W
+ !
+ address-family ipv4 unicast autonomous-system 1831
+  !
+  topology base
+  exit-af-topology
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+ exit-address-family
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
+
+R17# 

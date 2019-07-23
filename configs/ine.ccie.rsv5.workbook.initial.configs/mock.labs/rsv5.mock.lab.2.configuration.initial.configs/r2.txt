@@ -1,0 +1,158 @@
+
+!
+! Last configuration change at 00:16:52 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$IzzF$grGL6GFJq77x.K6YB6u0t/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9DMEUSB233Y
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.2 255.255.255.255
+ ipv6 address 2001:172:16:1::2/128
+!
+interface Tunnel0
+ ip address 180.10.254.2 255.255.255.0
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::2/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 180.10.12.2 255.255.255.0
+ 
+ ipv6 address 2001:180:10:12::2/64
+ ipv6 mtu 1500
+ 
+ 
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 180.10.24.2 255.255.255.0
+ ipv6 address 2001:180:10:24::2/64
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 44.2.5.3 255.255.255.254
+ ipv6 address 2001:44:2:5::3/127
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 180.10.216.2 255.255.255.0
+ ipv6 address 2001:180:10:216::2/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

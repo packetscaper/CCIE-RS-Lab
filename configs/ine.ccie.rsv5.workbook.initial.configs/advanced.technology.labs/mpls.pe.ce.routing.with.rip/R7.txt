@@ -1,0 +1,90 @@
+!
+version 15.2
+!
+enable
+configure terminal
+no service timestamps debug uptime
+no service timestamps log uptime
+!
+hostname R7
+!
+no ip domain lookup
+ip routing
+ipv6 unicast-routing
+!
+cdp run
+!
+interface Loopback0
+ ipv6 address 2001:150:7:7::7/128
+ ip address 150.1.7.7 255.255.255.255
+!
+interface GigabitEthernet1
+ cdp enable
+ no shutdown
+!
+interface GigabitEthernet1.7
+ encapsulation dot1q 7
+ ip address 155.1.7.7 255.255.255.0
+ ipv6 address 2001:155:1:7::7/64
+!
+interface GigabitEthernet1.37
+ encapsulation dot1q 37
+ ip address 155.1.37.7 255.255.255.0
+ ipv6 address 2001:155:1:37::7/64
+!
+interface GigabitEthernet1.67
+ encapsulation dot1q 67
+ ip address 155.1.67.7 255.255.255.0
+ ipv6 address 2001:155:1:67::7/64
+!
+interface GigabitEthernet1.79
+ encapsulation dot1q 79
+ ip address 155.1.79.7 255.255.255.0
+ ipv6 address 2001:155:1:79::7/64
+!
+
+ip vrf VPN_A
+ rd 100:1
+
+
+ip vrf VPN_B
+ rd 100:2	
+ 
+
+!
+interface GigabitEthernet1.67
+ encapsulation dot1q 67
+ ip vrf forwarding VPN_A
+ ip address 155.1.67.7 255.255.255.0
+!
+interface GigabitEthernet1.76
+ encapsulation dot1q 76
+ ip vrf forwarding VPN_B
+ ip address 155.1.76.7 255.255.255.0
+!
+interface Loopback 101
+ ip vrf forwarding VPN_A
+ ip address 172.16.7.7 255.255.255.0
+!
+interface Loopback 102
+ ip vrf forwarding VPN_B
+ ip address 192.168.7.7 255.255.255.0
+!
+!
+ip route vrf VPN_A 0.0.0.0 0.0.0.0 155.1.67.6
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+!
+line vty 0 4
+ privilege level 15
+ no login
+!
+end
+
+
+!
+end

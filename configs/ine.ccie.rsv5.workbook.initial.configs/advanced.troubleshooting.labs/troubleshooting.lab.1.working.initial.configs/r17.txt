@@ -1,0 +1,174 @@
+
+!
+! Last configuration change at 16:02:16 UTC Sat Oct 4 2014
+enable
+configure terminal
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging monitor
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9ZKEEWZ6S6H
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.17 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 227.7.7.7
+ ip ospf 22 area 0
+ ipv6 address 2001:122:1:1::17/128
+!
+interface GigabitEthernet1
+ no shutdown
+
+ 
+!
+interface GigabitEthernet1.1617
+ encapsulation dot1Q 1617
+ ip address 172.23.17.17 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ip ospf cost 1
+ ipv6 address 2004:172:23:17::17/64
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip address 172.23.18.17 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ipv6 address 2004:172:23:18::17/64
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ ip address 172.23.179.17 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 0
+ ipv6 address 2004:172:23:179::17/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ 
+!
+!
+router eigrp INE_DOT_COM
+ !
+ address-family ipv6 unicast autonomous-system 925
+  !
+  af-interface default
+   authentication mode hmac-sha-256 v6PASS!
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospf 22
+ fast-reroute per-prefix enable area 0 prefix-priority high
+ fast-reroute per-prefix enable prefix-priority low
+ fast-reroute keep-all-paths
+ area 10 virtual-link 192.168.1.16
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

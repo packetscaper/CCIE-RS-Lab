@@ -1,0 +1,14 @@
+hostname SW3
+!
+no ip domain-lookup
+!
+interface Loopback0
+ ip address 23.23.23.23 255.255.255.255
+ ipv6 address 2001:23:23:23::23/128
+!
+interface Vlan239
+ ip address 10.1.239.23 255.255.255.0
+ ipv6 address 2001:10:1:239::23/64
+!
+end
+

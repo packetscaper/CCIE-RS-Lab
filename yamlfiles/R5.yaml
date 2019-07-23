@@ -1,0 +1,48 @@
+---
+  
+  id : 5 
+
+  interface : Ethernet0/0
+  
+  subinterfaces:
+
+      - subint : 45 
+        des : connected to R4
+        area : 0
+
+      - subint : 58 
+        des : connected to R8
+        area : 3
+
+      - subint : 5 
+        des : connected to R5 
+        area : 3
+
+      - subint : 100
+        des: connected to DMVPN
+
+
+  AS : 200
+
+  BGP: 
+
+   neighbors:
+
+     - neighbor  : 155.1.0.2
+       AS        : 200
+
+     - neighbor : 155.1.58.8
+       AS       : 200
+
+     - neighbor : 155.1.0.3
+       AS       : 200
+
+     - neighbor : 155.1.45.4
+       AS       : 100
+
+
+
+   RR_clients:
+       - 155.1.0.2
+       - 155.1.58.8
+

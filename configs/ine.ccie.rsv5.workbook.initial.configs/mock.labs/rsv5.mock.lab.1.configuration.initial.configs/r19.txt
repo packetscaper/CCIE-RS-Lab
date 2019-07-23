@@ -1,0 +1,154 @@
+
+!
+! Last configuration change at 00:01:57 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+flow record RECORD
+ match routing next-hop address ipv4
+ match routing next-hop address ipv6
+ match transport source-port
+ match interface input
+ collect flow direction
+ collect pfr one-way-delay sum
+!
+!
+flow monitor MONITOR
+ record RECORD
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9XAWN25SZ6N
+spanning-tree extend system-id
+!
+username R20 password 0 CCIE
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.19 255.255.255.255
+ ipv6 address FE80::19 link-local
+ ipv6 address 2001:122:1:1::19/128
+!
+interface GigabitEthernet1
+ no shutdown
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ ip address 172.23.179.19 255.255.255.0
+ ipv6 address 2004:172:23:179::19/64
+!
+interface GigabitEthernet1.1920
+ encapsulation dot1Q 1920
+ ipv6 address FE80::19 link-local
+ ipv6 address 2004:172:23:19::19/64
+ ip address 172.23.19.19 255.255.255.0
+!
+interface GigabitEthernet1.1922
+ encapsulation dot1Q 1922
+ ip address 172.23.229.19 255.255.255.0
+ ipv6 address 2004:172:23:229::19/64
+!
+!
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ login
+!
+!
+end

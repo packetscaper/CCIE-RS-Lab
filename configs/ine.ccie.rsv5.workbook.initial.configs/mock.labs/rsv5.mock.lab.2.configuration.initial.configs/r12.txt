@@ -1,0 +1,158 @@
+
+!
+! Last configuration change at 00:16:52 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition FVRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$uXSY$XgQKPEujJobKY8Wla82Qn/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9RIGE0C5F9C
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.12 255.255.255.255
+ ipv6 address 2001:172:16:1::12/128
+!
+!
+interface Tunnel0
+ ip address 180.10.254.12 255.255.255.0
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.1012
+ encapsulation dot1Q 1012
+ vrf forwarding FVRF
+ ip address 44.2.5.9 255.255.255.254
+ ipv6 address 2001:44:2:5::9/127
+!
+interface GigabitEthernet1.1112
+ encapsulation dot1Q 1112
+ ip address 180.10.121.1 255.255.255.254
+ ipv6 address 2001:180:10:121::1/127
+!
+interface GigabitEthernet1.1210
+ encapsulation dot1Q 1210
+ ip address 180.10.120.12 255.255.255.0
+ ipv6 address 2001:180:10:120::12/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+router rip
+ version 2
+ network 180.10.0.0
+ no auto-summary
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

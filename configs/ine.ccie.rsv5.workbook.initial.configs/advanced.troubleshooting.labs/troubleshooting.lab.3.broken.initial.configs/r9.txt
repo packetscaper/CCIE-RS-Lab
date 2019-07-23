@@ -1,0 +1,149 @@
+
+!
+! Last configuration change at 00:20:54 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R9
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 989PI5Z8M4J
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$kw8E$xNz3hs1XpH7ENv0puWoj0/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.9 255.255.255.255
+ ipv6 address ::192:122:3:9/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.79
+ encapsulation dot1Q 79
+ ip address 172.30.79.9 255.255.255.224
+ ipv6 address 2001:172:30:79::9/120
+!
+interface GigabitEthernet1.89
+ encapsulation dot1Q 89
+ ip address 172.30.89.9 255.255.255.224
+ ipv6 address 2001:172:30:89::9/120
+!
+interface GigabitEthernet2
+ ip address 192.168.1.9 255.255.255.0
+ negotiation auto
+!
+router bgp 65100
+ bgp log-neighbor-changes
+ network 172.30.79.0 mask 255.255.255.224
+ network 172.30.89.0 mask 255.255.255.224
+ network 192.122.3.9 mask 255.255.255.255
+ neighbor 172.30.79.7 remote-as 65006
+ neighbor 172.30.79.7 send-community
+ neighbor 172.30.89.8 remote-as 65006
+ neighbor 172.30.89.8 send-community
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

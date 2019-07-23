@@ -1,0 +1,172 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:45:16 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain HSRP_KEY
+ key 0
+   key-string cisco1
+!
+!
+license udi pid CSR1000V sn 97B6YBUT01O
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.13 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:10:255:255::13/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.100
+ encapsulation dot1Q 100
+ ip address 172.29.100.13 255.255.255.0
+ ip pim sparse-mode
+ standby 100 ip 172.29.100.254
+ standby 100 ip 172.29.100.253 secondary
+ standby 100 priority 150
+ standby 100 authentication md5 key-chain HSRP_KEY
+ ip igmp join-group 224.1.2.3
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf 1 area 0
+ ipv6 address 2001:172:29:100::13/64
+!
+interface GigabitEthernet1.135
+ encapsulation dot1Q 135
+ ip address 172.29.135.13 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 address 2001:172:29:135::13/64
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ neighbor 172.29.100.15 cost 1000
+ neighbor 172.29.100.14
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip mroute 0.0.0.0 0.0.0.0 172.29.100.15
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 10.255.255.8
+access-list 10 permit 10.255.255.9
+access-list 20 permit 10.255.255.14
+access-list 20 permit 10.255.255.15
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+ntp authentication-key 123 md5 080F0D7E223C3C 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp access-group peer 10
+ntp access-group serve-only 20
+ntp server 10.255.255.9 key 123
+!
+end

@@ -1,0 +1,74 @@
+!
+version 15.2
+!
+enable
+configure terminal
+no service timestamps debug uptime
+no service timestamps log uptime
+!
+hostname R7
+!
+no ip domain lookup
+ip routing
+ipv6 unicast-routing
+!
+cdp run
+!
+interface Loopback0
+ ipv6 address 2001:150:7:7::7/128
+ ip address 150.1.7.7 255.255.255.255
+!
+interface GigabitEthernet1
+ cdp enable
+ no shutdown
+!
+interface GigabitEthernet1.7
+ encapsulation dot1q 7
+ ip address 155.1.7.7 255.255.255.0
+ ipv6 address 2001:155:1:7::7/64
+!
+interface GigabitEthernet1.37
+ encapsulation dot1q 37
+ ip address 155.1.37.7 255.255.255.0
+ ipv6 address 2001:155:1:37::7/64
+!
+interface GigabitEthernet1.67
+ encapsulation dot1q 67
+ ip address 155.1.67.7 255.255.255.0
+ ipv6 address 2001:155:1:67::7/64
+!
+interface GigabitEthernet1.79
+ encapsulation dot1q 79
+ ip address 155.1.79.7 255.255.255.0
+ ipv6 address 2001:155:1:79::7/64
+!
+router eigrp SECURITY
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 150.1.0.0
+  network 155.1.0.0
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+!
+line vty 0 4
+ no login
+!
+end
+
+
+!
+end

@@ -1,0 +1,217 @@
+
+!
+! Last configuration change at 16:02:16 UTC Sat Oct 4 2014
+enable
+configure terminal
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R18
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging monitor
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+ip vrf A
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing vrf A distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 99IBUFLFZQE
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+crypto keyring KEY_RING vrf A 
+  pre-shared-key address 122.1.1.10 key CISCO
+!
+!
+!
+!
+!
+crypto isakmp policy 18
+ encr aes
+ hash sha512
+ authentication pre-share
+ group 16
+!
+!
+crypto ipsec transform-set ENTERPRISE_ENCRYPTION esp-des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile CRYPTO_PROFILE
+ set transform-set ENTERPRISE_ENCRYPTION 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip vrf forwarding A
+ ip address 122.1.1.18 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 22 area 0
+ ipv6 address 2001:122:1:1::18/128
+!
+interface Loopback100
+ description Anycast Loopback
+ ip vrf forwarding A
+ ip address 100.1.1.1 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 22 area 0
+ ipv6 address 2001::100/128
+!
+interface Tunnel10
+ description Multicast Tunnel to Site 1
+ ip vrf forwarding A
+ ip address 110.18.10.18 255.255.255.192
+ ip mtu 1400
+ ip pim bsr-border
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 122.1.1.10
+ tunnel vrf A
+ tunnel protection ipsec profile CRYPTO_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+
+ 
+!
+interface GigabitEthernet1.1618
+ encapsulation dot1Q 1618
+ ip vrf forwarding A
+ ip address 172.23.16.18 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ip ospf cost 1
+ ipv6 address 2004:172:23:16::18/64
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip vrf forwarding A
+ ip address 172.23.18.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ipv6 address 2004:172:23:18::18/64
+!
+interface GigabitEthernet1.1820
+ encapsulation dot1Q 1820
+ ip vrf forwarding A
+ ip address 172.23.20.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 20
+ ipv6 address 2004:172:23:20::18/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ 
+!
+!
+router eigrp INE_DOT_COM
+ !
+ address-family ipv6 unicast autonomous-system 925
+  !
+  af-interface default
+   authentication mode hmac-sha-256 v6PASS!
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospf 22 vrf A
+ capability vrf-lite
+ area 10 virtual-link 192.168.1.16
+ area 20 virtual-link 122.1.1.20
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+ip pim vrf A bsr-candidate Loopback100 0
+ip pim vrf A rp-candidate Loopback100
+ip mroute vrf A 122.1.1.15 255.255.255.255 Tunnel10
+ip msdp vrf A peer 110.18.10.10 connect-source Tunnel10
+ip msdp vrf A cache-sa-state
+ip msdp vrf A password peer 110.18.10.10 MsDpP@sS!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

@@ -1,0 +1,205 @@
+
+!
+! Last configuration change at 00:20:54 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R16
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 90Y69TXLGPT
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$1EVq$/stT3SQkkkdPv.z.52dEw0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key DmvPn!23 address 89.211.117.17  
+crypto isakmp key DmvPn!23 address 202.4.180.0    
+!
+!
+crypto ipsec transform-set TRANSFORM_SET esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set TRANSFORM_SET 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.16 255.255.255.255
+ ipv6 address ::192:122:3:16/128
+!
+interface Tunnel100
+ ip address 172.100.123.16 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPKEY
+ ip nhrp map 172.100.123.18 202.4.180.0
+ ip nhrp map multicast 202.4.180.0
+ ip nhrp network-id 100
+ ip nhrp nhs 172.100.123.18
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1.216
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.16 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:89:211:116::16/125
+ ipv6 dhcp client pd SITE_F
+!
+interface GigabitEthernet1.160
+ encapsulation dot1Q 160
+ ip address 172.23.160.16 255.255.255.0
+ ipv6 address SITE_F ::16/64
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 202.4.216.16 255.255.255.192
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:202:4:216::16/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.16 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface GigabitEthernet1.160
+   summary-address 172.0.0.0 255.0.0.0
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.23.160.0 0.0.0.255
+  network 172.100.123.0 0.0.0.255
+  eigrp stub connected summary redistributed
+ exit-address-family
+!
+router ospf 100
+ router-id 192.122.3.16
+ max-lsa 1
+ fast-reroute per-prefix enable prefix-priority low
+ area 121 nssa
+ redistribute connected subnets route-map CONNECTED_INTO_OSPF
+ mpls ldp autoconfig
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface Loopback0
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

@@ -1,0 +1,242 @@
+!
+version 15.2
+!
+enable
+conf t
+
+
+Current configuration : 3748 bytes
+!
+! Last configuration change at 16:24:00 UTC Sat May 10 2014
+!
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+ip vrf VPN_A
+ rd 100:1
+ route-target export 100:1
+ route-target import 100:1
+!
+ip vrf VPN_B
+ rd 100:2
+ export map VPN_B_EXPORT
+ route-target export 100:2
+ route-target import 100:2
+ route-target import 100:55
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required
+mpls ldp neighbor 150.1.4.4 password CISCO
+no mpls ldp advertise-labels
+mpls ldp advertise-labels for 10
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 150.1.6.6 255.255.255.255
+ ipv6 address 2001:150:6:6::6/128
+!
+interface Loopback102
+ ip vrf forwarding VPN_B
+ ip address 192.168.6.6 255.255.255.0
+!
+interface Loopback200
+ ip vrf forwarding VPN_A
+ ip address 150.1.66.66 255.255.255.255
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet1.67
+ encapsulation dot1Q 67
+ ip vrf forwarding VPN_A
+ ip address 155.1.67.6 255.255.255.0
+ ipv6 address 2001:155:1:67::6/64
+!
+interface GigabitEthernet1.76
+ encapsulation dot1Q 76
+ ip vrf forwarding VPN_B
+ ip address 155.1.76.6 255.255.255.0
+!
+interface GigabitEthernet1.146
+ encapsulation dot1Q 146
+ ip address 155.1.146.6 255.255.255.0
+ ipv6 address 2001:155:1:146::6/64
+ mpls ip
+ mpls ldp discovery transport-address interface
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 100 vrf VPN_A
+ domain-id 0.0.0.6
+ area 1 sham-link 150.1.66.66 150.1.55.55
+ summary-address 172.16.0.0 255.255.0.0
+ redistribute bgp 100 subnets
+ network 155.1.67.6 0.0.0.0 area 1
+!
+router ospf 1
+ router-id 150.1.6.6
+ network 150.1.0.0 0.0.255.255 area 0
+ network 155.1.0.0 0.0.255.255 area 0
+!
+router rip
+ version 2
+ no auto-summary
+ !
+ address-family ipv4 vrf VPN_B
+  redistribute bgp 100 metric transparent
+  network 155.1.0.0
+  network 192.168.6.0
+  no auto-summary
+ exit-address-family
+!
+router bgp 100
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 150.1.4.4 remote-as 100
+ neighbor 150.1.4.4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 150.1.4.4 activate
+  neighbor 150.1.4.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_A
+  network 150.1.66.66 mask 255.255.255.255
+  redistribute connected
+  redistribute static
+  redistribute ospf 100
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_B
+  redistribute connected
+  redistribute static
+  redistribute rip
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route vrf VPN_A 192.168.7.0 255.255.255.0 GigabitEthernet1.76 155.1.76.7
+!
+!
+ip prefix-list LO102 seq 5 permit 192.168.6.0/24
+access-list 10 permit 150.1.0.0 0.0.255.255
+!
+route-map VPN_B_EXPORT permit 10
+ match ip address prefix-list LO102
+ set extcommunity rt 100:66
+!
+route-map VPN_B_EXPORT permit 20
+ set extcommunity rt 100:2
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end
+
+R6#
+!
+end

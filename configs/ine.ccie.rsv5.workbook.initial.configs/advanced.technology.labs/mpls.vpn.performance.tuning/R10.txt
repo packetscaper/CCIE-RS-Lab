@@ -1,0 +1,157 @@
+!
+version 15.2
+!
+enable
+conf t
+
+
+Current configuration : 1779 bytes
+!
+! Last configuration change at 19:53:29 UTC Sat May 10 2014
+!
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 150.1.10.10 255.255.255.255
+ ipv6 address 2001:150:10:10::10/128
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet1.10
+ encapsulation dot1Q 10
+ ip address 155.1.10.10 255.255.255.0
+ ipv6 address 2001:155:1:10::10/64
+!
+interface GigabitEthernet1.106
+ encapsulation dot1Q 106
+ ip address 160.1.106.10 255.255.255.0
+!
+interface GigabitEthernet1.108
+ encapsulation dot1Q 108
+ ip address 155.1.108.10 255.255.255.0
+ ipv6 address 2001:155:1:108::10/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 106
+ bgp log-neighbor-changes
+ network 150.1.10.10 mask 255.255.255.255
+ neighbor 160.1.106.6 remote-as 100
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end
+
+R10#
+!
+end

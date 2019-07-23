@@ -1,0 +1,272 @@
+
+!
+! Last configuration change at 18:02:36 UTC Sun Jul 13 2014
+!
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging discriminator DIS msg-body drops TCP-6-BADAUTH
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required for 10
+mpls ldp neighbor 122.1.1.1 password LDP!PASS
+mpls ldp neighbor 122.1.1.2 password LDP!PASS
+mpls ldp neighbor 122.1.1.4 password LDP!PASS
+mpls ldp neighbor 122.1.1.5 password LDP!PASS
+mpls ldp neighbor 122.1.1.16 password LDP!PASS
+multilink bundle-name authenticated
+!
+key chain bfddefault
+ key 0
+   key-string CC!E
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+bfd-template single-hop default
+ interval min-tx 500 min-rx 500 multiplier 3
+ authentication meticulous-sha-1 keychain bfddefault
+ dampening 3 1500 3000 5
+ echo
+!
+!
+!
+!
+!
+!
+!
+!
+class-map match-all bgp
+ match access-group 101
+!
+policy-map bgp
+ class bgp
+  police 8000 conform-action drop  exceed-action drop  violate-action drop 
+!
+bfd slow-timers 30000
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.3 255.255.255.255
+ ip ospf 100 area 100
+ ipv6 address 2001:122:1:1::3/128
+ ospfv3 101 ipv6 area 0 instance 1
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.16.0.2 255.255.255.252
+ ip ospf 100 area 100
+ ipv6 address 2001:10:16::2/126
+ ospfv3 101 ipv6 area 0 instance 1
+ bfd interval 100 min_rx 300 multiplier 3
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.16.0.6 255.255.255.252
+ ip ospf 100 area 100
+ ipv6 address 2001:10:16::6/126
+ ospfv3 101 ipv6 area 0 instance 1
+ bfd interval 100 min_rx 300 multiplier 3
+!
+interface GigabitEthernet1.34
+ encapsulation dot1Q 34
+ ip address 10.16.0.10 255.255.255.252
+ ip ospf 100 area 100
+ ipv6 address 2001:10:16::A/126
+ ospfv3 101 ipv6 area 0 instance 1
+ bfd interval 100 min_rx 300 multiplier 3
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.16.0.14 255.255.255.252
+ ip ospf 100 area 100
+ ipv6 address 2001:10:16::E/126
+ ospfv3 101 ipv6 area 0 instance 1
+ bfd template default
+!
+interface GigabitEthernet1.316
+ encapsulation dot1Q 316
+ ip address 10.16.0.18 255.255.255.252
+ ip ospf 100 area 100
+ ipv6 address 2001:10:16::12/126
+ ospfv3 101 ipv6 area 0 instance 1
+ bfd interval 100 min_rx 300 multiplier 3
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospfv3 101
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+router ospf 100
+ prefix-suppression
+ bfd all-interfaces
+ mpls ldp autoconfig area 100
+!
+router bgp 101
+ template peer-policy RR
+  route-reflector-client
+  send-community both
+  additional-paths send receive
+ exit-peer-policy
+ !
+ template peer-session RR
+  remote-as 101
+  password CC!E123
+  update-source Loopback0
+ exit-peer-session
+ !
+ bgp log-neighbor-changes
+ bgp listen range 122.1.1.0/24 peer-group AS_101
+ bgp listen limit 10
+ no bgp default ipv4-unicast
+ neighbor 122.1.1.1 inherit peer-session RR
+ neighbor 122.1.1.2 inherit peer-session RR
+ neighbor 122.1.1.4 inherit peer-session RR
+ neighbor 122.1.1.5 inherit peer-session RR
+ neighbor 122.1.1.16 inherit peer-session RR
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 122.1.1.1 activate
+  neighbor 122.1.1.1 send-community extended
+  neighbor 122.1.1.1 inherit peer-policy RR
+  neighbor 122.1.1.2 activate
+  neighbor 122.1.1.2 send-community extended
+  neighbor 122.1.1.2 inherit peer-policy RR
+  neighbor 122.1.1.5 activate
+  neighbor 122.1.1.5 send-community extended
+  neighbor 122.1.1.5 inherit peer-policy RR
+  neighbor 122.1.1.16 activate
+  neighbor 122.1.1.16 send-community extended
+  neighbor 122.1.1.16 inherit peer-policy RR
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 122.1.1.1 activate
+  neighbor 122.1.1.1 send-community extended
+  neighbor 122.1.1.1 inherit peer-policy RR
+  neighbor 122.1.1.2 activate
+  neighbor 122.1.1.2 send-community extended
+  neighbor 122.1.1.2 inherit peer-policy RR
+  neighbor 122.1.1.4 activate
+  neighbor 122.1.1.4 send-community extended
+  neighbor 122.1.1.4 inherit peer-policy RR
+  neighbor 122.1.1.5 activate
+  neighbor 122.1.1.5 send-community extended
+  neighbor 122.1.1.5 inherit peer-policy RR
+  neighbor 122.1.1.16 activate
+  neighbor 122.1.1.16 send-community extended
+  neighbor 122.1.1.16 inherit peer-policy RR
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 122.1.1.16
+access-list 10 permit 122.1.1.2
+access-list 10 permit 122.1.1.3
+access-list 10 permit 122.1.1.1
+access-list 10 permit 122.1.1.4
+access-list 10 permit 122.1.1.5
+
+!
+mpls ldp router-id Loopback0
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

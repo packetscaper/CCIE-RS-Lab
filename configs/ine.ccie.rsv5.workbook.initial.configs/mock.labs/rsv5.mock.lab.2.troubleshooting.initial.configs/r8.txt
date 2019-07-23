@@ -1,0 +1,175 @@
+
+!
+! Last configuration change at 21:45:15 UTC Sat Feb 28 2015
+! NVRAM config last updated at 21:45:16 UTC Sat Feb 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9O1KOE672K8
+license boot level ax
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 10.255.255.8 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:10:255:255::8/128
+!
+interface Tunnel89
+ ip unnumbered Loopback0
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.9
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.28
+ encapsulation dot1Q 28
+ ip address 172.31.28.8 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 address 2001:172:31:28::8/64
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.31.78.8 255.255.255.0
+ ipv6 address 2001:172:31:78::8/64
+!
+interface GigabitEthernet1.228
+ encapsulation dot1Q 228
+ ip address 172.31.228.8 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 0
+!
+interface GigabitEthernet2
+ vrf forwarding MGMT_DO_NOT_CHANGE
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ redistribute connected subnets route-map connected
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip mroute 0.0.0.0 0.0.0.0 Tunnel89
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 10.255.255.9
+access-list 10 permit 10.255.255.13
+access-list 20 permit 10.255.255.7
+access-list 20 permit 10.255.255.22
+!
+route-map connected permit 10
+ match interface GigabitEthernet1.78
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+ntp authentication-key 123 md5 132B2322205F3D 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp access-group peer 10
+ntp access-group serve-only 20
+ntp master 3
+ntp peer 10.255.255.9 key 123
+!
+end

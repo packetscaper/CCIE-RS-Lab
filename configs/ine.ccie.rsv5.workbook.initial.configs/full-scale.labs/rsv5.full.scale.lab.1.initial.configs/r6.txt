@@ -1,0 +1,149 @@
+
+!
+! Last configuration change at 23:01:11 UTC Thu Sep 18 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 95OSJ0DCRXR
+license boot level ax
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$eF1d$RtoVvxulLL30InAq01r0F1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.6 255.255.255.255
+ ipv6 address ::192:122:3:6/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.0.36.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:36::2/126
+!
+interface GigabitEthernet1.46
+ encapsulation dot1Q 46
+ ip address 10.0.46.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:46::2/126
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.0.56.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:56::2/126
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 202.4.60.0 255.255.255.254
+ ipv6 address 2001:202:4:60::/127
+!
+interface GigabitEthernet2
+ ip address 192.168.1.6 255.255.255.0
+ negotiation auto
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ neighbor 202.4.60.1 remote-as 65123
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

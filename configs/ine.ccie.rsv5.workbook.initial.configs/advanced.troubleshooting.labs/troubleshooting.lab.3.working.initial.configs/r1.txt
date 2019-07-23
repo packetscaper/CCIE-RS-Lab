@@ -1,0 +1,240 @@
+
+!
+! Last configuration change at 03:32:24 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+ipv6 dhcp pool ipv6-dhcp-pool
+ prefix-delegation pool ipv6-pool
+!
+no ipv6 dhcp server join all-dhcp-servers
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+
+license udi pid CSR1000V sn 92HVO0PSL3U
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$6cdl$cmjLSX79LVHEnbYagSKEm/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+bba-group pppoe r1-r17
+ virtual-template 117
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.1 255.255.255.255
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:1/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 10
+ ipv6 address 2001:10:0:12::1/126
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.0.13.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network point-to-multipoint
+ ip ospf hello-interval 10
+ ip ospf 100 area 20
+ ipv6 address 2001:10:0:13::1/126
+!
+interface GigabitEthernet1.14
+ encapsulation dot1Q 14
+ ip address 10.0.14.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:14::1/126
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 136.5.17.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:17::1/64
+ mpls ip
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:18::1/64
+ mpls ip
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:89:211:116::1/125
+ ipv6 dhcp server ipv6-dhcp-pool
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ipv6 address 2001:89:211:117::1/125
+ pppoe enable group r1-r17
+!
+interface GigabitEthernet2
+ description MGMT INTERFACE - DO NOT CHANGE
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+!
+interface Virtual-Template117
+ ip address 89.211.117.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 117
+ no peer neighbor-route
+ peer default ip address pool r1-r17-pool
+ ppp ipcp mask 255.255.255.128
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 100 metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 136.5.17.0 0.0.0.255
+  network 136.5.18.0 0.0.0.255
+  metric weights 0 0 0 1 0 0 0
+ exit-address-family
+!
+router ospf 100
+ router-id 192.122.3.1
+ compatible rfc1587
+ fast-reroute per-prefix enable prefix-priority low
+ area 20 virtual-link 192.122.3.3
+ area 121 nssa default-information-originate
+ summary-address 192.122.3.7 255.255.255.255
+ summary-address 192.122.3.8 255.255.255.255
+ redistribute connected subnets route-map CONNECTED_INTO_OSPF
+ redistribute eigrp 56 subnets route-map EIGRP_INTO_OSPF_REDISTRIBUTION
+ passive-interface GigabitEthernet1.117
+ mpls ldp autoconfig
+!
+!
+virtual-service csr_mgmt
+ ip shared host-interface GigabitEthernet2
+ activate
+!
+ip local pool r1-r17-pool 89.211.117.17
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ipv6 local pool ipv6-pool 2001:172:23:160::/64 64
+!
+route-map EIGRP_INTO_OSPF_REDISTRIBUTION permit 10
+ set tag 190
+!
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface GigabitEthernet1.14
+ set metric 1000
+ set metric-type type-1
+!
+route-map CONNECTED_INTO_OSPF permit 20
+ match interface GigabitEthernet1.17 GigabitEthernet1.18
+ set tag 190
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

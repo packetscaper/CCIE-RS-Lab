@@ -1,0 +1,171 @@
+
+!
+! Last configuration change at 03:32:24 UTC Wed Oct 22 2014
+enable
+configure terminal
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9MWA7QEAAU8
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$VjTE$/YiAPH4DkXsExv6rqM5OI0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.10 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 224.11.11.11
+ ip igmp join-group 224.10.10.10
+ ipv6 address ::192:122:3:10/128
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.102
+ encapsulation dot1Q 102
+ ip address 172.19.102.10 255.255.255.128
+ ip pim sparse-mode
+ ipv6 address 2001:172:19:102::10/64
+ bfd interval 150 min_rx 150 multiplier 3
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 202.4.210.10 255.255.255.0
+ ipv6 address 2001:202:4:210::10/64
+!
+interface GigabitEthernet2
+ ip address 192.168.1.10 255.255.255.0
+ negotiation auto
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 789
+  !
+  af-interface GigabitEthernet1.102
+   bfd
+  exit-af-interface
+  !
+  topology base
+   redistribute bgp 65100 metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 172.19.102.0 0.0.0.255
+  network 192.122.3.10 0.0.0.0
+  metric rib-scale 116
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 789
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router bgp 65100
+ bgp log-neighbor-changes
+ redistribute eigrp 789
+ neighbor 202.4.210.2 remote-as 65006
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

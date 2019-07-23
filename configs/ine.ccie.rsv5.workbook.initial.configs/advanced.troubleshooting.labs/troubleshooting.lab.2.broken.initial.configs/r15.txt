@@ -1,0 +1,174 @@
+
+!
+! Last configuration change at 01:32:03 UTC Sun Aug 10 2014
+enable
+configure terminal
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+enable secret 5 $1$RoE7$j0306uTsRFxVJ5oVbBC4z1
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.15 255.255.255.255
+ ipv6 address 2001:172:16:1::15/128
+!
+interface Loopback1
+ ip address 192.168.100.15 255.255.255.255
+!
+interface Loopback2
+ description Anycast
+ ip address 192.168.100.100 255.255.255.255
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.1315
+ encapsulation dot1Q 1315
+ ip address 180.10.153.15 255.255.255.192
+ ipv6 address 2001:180:10:153::15/124
+!
+interface GigabitEthernet1.1519
+ encapsulation dot1Q 1519
+ ip address 180.10.159.15 255.255.255.192
+ ipv6 address 2001:180:10:159::15/123
+!
+interface GigabitEthernet1.1520
+ encapsulation dot1Q 1520
+ ip address 180.10.152.15 255.255.255.192
+ ipv6 address 2001:180:10:152::15/123
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+
+!
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface GigabitEthernet1.1520
+   summary-address 192.168.0.0 255.255.0.0
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.1519
+   summary-address 192.168.0.0 255.255.0.0
+  exit-af-interface
+  !
+  topology base
+   fast-reroute per-prefix all
+  exit-af-topology
+  network 172.16.1.0 0.0.0.255
+  network 180.10.0.0
+  network 192.168.15.1 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 56
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end

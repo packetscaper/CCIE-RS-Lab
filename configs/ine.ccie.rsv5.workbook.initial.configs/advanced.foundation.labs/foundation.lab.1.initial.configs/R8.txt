@@ -1,0 +1,15 @@
+hostname R8
+!
+no ip domain lookup
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ip address 8.8.8.8 255.255.255.255
+ ipv6 address 2001:8:8:8::8/128
+interface GigabitEthernet1.68
+ encapsulation dot1Q 68
+ ip address 10.1.68.8 255.255.255.0
+ ipv6 address 2001:10:1:68::8/64
+!
+end

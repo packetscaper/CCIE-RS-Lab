@@ -1,0 +1,158 @@
+
+!
+! Last configuration change at 00:16:52 UTC Sat Mar 28 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition FVRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$1nlv$DWgxh5n9F5bhEjI46s7Ng0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9XAWN25SZ6N
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.19 255.255.255.255
+ ipv6 address 2001:172:16:1::19/128
+!
+interface Tunnel0
+ ip address 180.10.254.19 255.255.255.0
+!
+interface GigabitEthernet1
+ no shutdown
+ negotiation auto
+!
+interface GigabitEthernet1.1019
+ encapsulation dot1Q 1019
+ vrf forwarding FVRF
+ ip address 44.2.5.11 255.255.255.254
+ ipv6 address 2001:44:2:5::B/127
+!
+interface GigabitEthernet1.1319
+ encapsulation dot1Q 1319
+ ip address 180.10.139.19 255.255.255.192
+ ipv6 address 2001:180:10:139::19/124
+!
+interface GigabitEthernet1.1519
+ encapsulation dot1Q 1519
+ ip address 180.10.159.19 255.255.255.192
+ ipv6 address 2001:180:10:159::19/123
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ ip address 180.10.197.1 255.255.255.254
+ ipv6 address 2001:180:10:197::1/127
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5
+ login
+!
+!
+end

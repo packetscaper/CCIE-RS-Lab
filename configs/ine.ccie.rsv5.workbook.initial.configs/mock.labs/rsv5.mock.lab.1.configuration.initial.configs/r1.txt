@@ -1,0 +1,165 @@
+
+!
+! Last configuration change at 00:01:57 UTC Wed Mar 4 2015
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition CustA
+ rd 122.1.1.1:100
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 92HVO0PSL3U
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 122.1.1.1 255.255.255.255
+ ipv6 address 2001:122:1:1::1/128
+!
+interface Loopback1
+ vrf forwarding CustA
+ ip address 192.168.1.1 255.255.255.255
+ ipv6 address 2002:192:168:1::1/128
+!
+interface GigabitEthernet1
+ no shutdown
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.16.0.29 255.255.255.252
+ ipv6 address 2001:10:16::1D/126
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.16.0.1 255.255.255.252
+ ipv6 address 2001:10:16::1/126
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ vrf forwarding CustA
+ ip address 10.245.1.0 255.255.255.254
+ ipv6 address 2001:10:245:1::/127
+!
+interface GigabitEthernet1.115
+ encapsulation dot1Q 115
+ vrf forwarding CustA
+ ip address 10.245.1.2 255.255.255.254
+ ipv6 address 2001:10:245:1::2/127
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ speed 1000
+ no negotiation auto
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+
+
+
+
+
+
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ login
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
+line vty 5 10
+ login
+!
+!
+end

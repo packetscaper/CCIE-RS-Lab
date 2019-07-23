@@ -1,0 +1,264 @@
+!
+version 15.2
+!
+enable
+conf t
+
+
+Current configuration : 4168 bytes
+!
+! Last configuration change at 14:43:56 UTC Sat May 10 2014
+!
+version 15.4
+no service timestamps debug uptime
+no service timestamps log uptime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+ip vrf VPN_A
+ rd 100:1
+ export map VPN_A_EXPORT
+ route-target export 100:1
+ route-target import 100:1
+ route-target import 100:66
+!
+ip vrf VPN_B
+ rd 100:2
+ route-target export 100:2
+ route-target import 100:2
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required
+mpls ldp neighbor 150.1.4.4 password CISCO
+no mpls ldp advertise-labels
+mpls ldp advertise-labels for 10
+multilink bundle-name authenticated
+!
+!
+license udi pid CSR1000V sn 9Y9VCZ8B841
+license boot level premium
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+cdp run
+!
+! 
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ hash md5
+ authentication pre-share
+ group 5
+crypto isakmp key cisco address 0.0.0.0        
+!
+!
+crypto ipsec transform-set ESP_AES_SHA esp-aes esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_SHA 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ ip address 150.1.5.5 255.255.255.255
+ ipv6 address 2001:150:5:5::5/128
+!
+interface Loopback101
+ ip vrf forwarding VPN_A
+ ip address 172.16.5.5 255.255.255.0
+!
+interface Tunnel0
+ ip address 155.1.0.5 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPPASS
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip tcp adjust-mss 1360
+ delay 1000
+ mpls ip
+ tunnel source GigabitEthernet1.100
+ tunnel mode gre multipoint
+ tunnel key 150
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet1.5
+ encapsulation dot1Q 5
+ ip vrf forwarding VPN_B
+ ip address 155.1.5.5 255.255.255.0
+ ipv6 address 2001:155:1:5::5/64
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 155.1.45.5 255.255.255.0
+ ipv6 address 2001:155:1:45::5/64
+ mpls ip
+!
+interface GigabitEthernet1.58
+ encapsulation dot1Q 58
+ ip vrf forwarding VPN_A
+ ip address 155.1.58.5 255.255.255.0
+ ipv6 address 2001:155:1:58::5/64
+!
+interface GigabitEthernet1.100
+ encapsulation dot1Q 100
+ ip address 169.254.100.5 255.255.255.0
+ ipv6 address 2001:169:254:100::5/64
+!
+interface GigabitEthernet2
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 100 vrf VPN_A
+ redistribute bgp 100 subnets
+ network 0.0.0.0 255.255.255.255 area 1
+!
+router ospf 1
+ router-id 150.1.5.5
+ network 150.1.0.0 0.0.255.255 area 0
+ network 155.1.0.0 0.0.255.255 area 0
+!
+router rip
+ version 2
+ no auto-summary
+ !
+ address-family ipv4 vrf VPN_B
+  redistribute bgp 100 metric transparent
+  network 155.1.0.0
+  no auto-summary
+ exit-address-family
+!
+router bgp 100
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 150.1.4.4 remote-as 100
+ neighbor 150.1.4.4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 150.1.4.4 activate
+  neighbor 150.1.4.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_A
+  redistribute connected
+  redistribute static
+  redistribute ospf 100
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_B
+  redistribute connected
+  redistribute static
+  redistribute rip
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list LO101 seq 5 permit 172.16.5.0/24
+access-list 10 permit 150.1.0.0 0.0.255.255
+!
+route-map VPN_A_EXPORT permit 10
+ match ip address prefix-list LO101
+ set extcommunity rt 100:55
+!
+route-map VPN_A_EXPORT permit 20
+ set extcommunity rt 100:1
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ privilege level 15
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+!
+!
+end
+
+R5#
+!
+end
