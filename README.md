@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment
+A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment.
 
 
 ## Setup
@@ -18,7 +18,7 @@ A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment
       
       ```
  
-## Use
+## Usage
 
 ### Initialize the lab
 
