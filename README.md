@@ -27,9 +27,13 @@ Eg.
   ```
    #ipython
    : from init import *
+   
    : start_all()
+   
    : init_lab()
+   
    : stop('R3')
+   
    : stop('R3')
   
   ```
@@ -40,8 +44,11 @@ Eg.
 
   ```
    :send('all','show ip int br')
+   
    :send(['R1','R2','R5'],'show cdp neighbor')
+   
    :send(['R1','R5'],['router eigrp 1,'network 155.1.0.0 0.0.255.255'])
+   
    :send('R1','show ip eigrp neighbor')
    
   ```
@@ -51,10 +58,15 @@ Eg.
 Eg. 
   ```
    :init_eigrp()
+   
    :remove_eigrp()
+   
    :init_ospf()
+   
    :remove_ospf()
+   
    :init_bgp()
+   
    :reset_lab()
    
   ```
@@ -65,6 +77,7 @@ Eg.
 
   ```
    :lslab() # displays all the labs
+   
    :lslab(ospf) # displays all the OSPF labs
    
    :load('bgp.full','all')  # loads the bgp.full lab. 
