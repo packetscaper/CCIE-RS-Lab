@@ -7,7 +7,8 @@ A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment.
 
 ## Setup
 
-1. Setup GNS3 in a Windows machine
+1. Install GNS3 in a Windows machine - https://www.gns3.com/software/download
+2. Install GNS3 VM in an ESXI - https://docs.gns3.com/1hEoK0rmtdBRnMaUaVoMHUbYwtDAltXYShiMJUp1GMxk/index.html
 2. Download topology.gns3 file and open it in GNS3.
 3. Issue git pull https://github.com/packetscaper/CCIE-RS-Lab.git in a linux machine
 4. Initialize yamlfilefiles/console.yaml based on your environment.
