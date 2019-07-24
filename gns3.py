@@ -11,7 +11,7 @@ class Gns3:
     url = "http://192.168.56.1:3080/v2/projects/"
     headers = {"Accept":"application/json","Content-Type":"application/json"}
 
-    with open('Route-Switch.gns3') as f:
+    with open('topology.gns3') as f:
         json_output = json.loads(f.read())
         project_id = json_output["project_id"]
         url = url + project_id
@@ -24,7 +24,7 @@ class Gns3:
     url = "http://192.168.56.1:3080/v2/projects/"
     headers = {"Accept":"application/json","Content-Type":"application/json"}
 
-    with open('Route-Switch.gns3') as f:
+    with open('topology.gns3') as f:
         json_output = json.loads(f.read())
         project_id = json_output["project_id"]
         url = url + project_id
@@ -37,7 +37,7 @@ class Gns3:
 
  def stop_all(self):
     threads =  []
-    with open('Route-Switch.gns3') as f:
+    with open('topology.gns3') as f:
         json_output = json.loads(f.read())
         project_id = json_output["project_id"]
     for node in json_output['topology']['nodes']:
@@ -47,7 +47,7 @@ class Gns3:
          t.start()
  def start_all(self):
     threads =  []
-    with open('Route-Switch.gns3') as f:
+    with open('topology.gns3') as f:
         json_output = json.loads(f.read())
         project_id = json_output["project_id"]
     for node in json_output['topology']['nodes']:
