@@ -30,7 +30,7 @@ A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment.
 ![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/topologies/BGP.png)
 
 
-More details follow the below workbooks <br>
+More details follow the INE workbooks from the below link <br>
 
 https://ine.com/products/ccie-routing-switching-workbook
 
