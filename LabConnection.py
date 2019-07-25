@@ -43,7 +43,7 @@ class LabConnection:
      with open('yamlfiles/'+'console.yaml') as f:
         o = yaml.safe_load(f)
         for router in routers :
-             threads.append(threading.Thread(target=self.push,args = (o["gnsip"],o["routermapping"][router],commands,router,)))
+             threads.append(threading.Thread(target=self.push,args = (o["gns3_vmware_ip"],o["routermapping"][router],commands,router,)))
         for t in threads:
                 t.start()
 

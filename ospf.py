@@ -17,7 +17,7 @@ class Ospf :
         print "Configuring ospf on all routers"
         for router in o["routermapping"]:
             commands = l.render('ospf_init.j2',router+'.yaml')
-            threads.append(threading.Thread(target=l.push,args=(o["gnsip"],o["routermapping"][router],commands,router,)))
+            threads.append(threading.Thread(target=l.push,args=(o["gns3_vmware_ip"],o["routermapping"][router],commands,router,)))
 
     for t in threads:
          t.start()
@@ -33,7 +33,7 @@ class Ospf :
          o = yaml.safe_load(f)
          for router in o["routermapping"]:
             commands = ['no router ospf 1'] 
-            threads.append(threading.Thread(target=l.push,args=(o["gnsip"],o["routermapping"][router],commands,router,)))
+            threads.append(threading.Thread(target=l.push,args=(o["gns3_vmware_ip"],o["routermapping"][router],commands,router,)))
 
 
        for t in threads:

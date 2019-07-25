@@ -45,7 +45,7 @@ def init_L2_switch():
         o = yaml.safe_load(f)
         for vlan in o["vlans"]:
             commandset.append('vlan ' + str(vlan))
-        l.push(o["gnsip"],o["switchmapping"]["Sw0"],commandset,"L2Switch")
+        l.push(o["gns3_vmware_ip"],o["switchmapping"]["Sw0"],commandset,"L2Switch")
 
 
 def init_routers():
@@ -57,7 +57,7 @@ def init_routers():
         for router in o["routermapping"]:
             print "initializing", router
             commands = l.render('init.j2',router+".yaml")
-            threads.append(threading.Thread(target=l.push, args=(o["gnsip"],o["routermapping"][router],commands,router)))
+            threads.append(threading.Thread(target=l.push, args=(o["gns3_vmware_ip"],o["routermapping"][router],commands,router)))
 
    for t in threads :
         t.start()
@@ -111,7 +111,7 @@ def load(lab,routers):
        o = yaml.safe_load(f)
        print "loading " + lab
        for router in routers:
-        threads.append(threading.Thread(target=l.push,args=(o["gnsip"],o["routermapping"][router],final_commands[router],router))) 
+        threads.append(threading.Thread(target=l.push,args=(o["gns3_vmware_ip"],o["routermapping"][router],final_commands[router],router))) 
    for t in threads:
          t.start()
 

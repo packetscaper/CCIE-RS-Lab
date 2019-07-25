@@ -1,14 +1,19 @@
 import yaml
 from LabConnection import *
 import threading
-import requests,json,time
+import requests,json,time,yaml
 
 
 class Gns3:
 
+ def __init__(self):
+   with open('yamlfiles/console.yaml') as f:
+       o = yaml.safe_load(f)
+       self.gns3_host = "http://"+o["gns3_host_ip"]+":3080/"
+    
 
  def start(self,device):
-    url = "http://192.168.56.1:3080/v2/projects/"
+    url = self.gns3_host+"v2/projects/"
     headers = {"Accept":"application/json","Content-Type":"application/json"}
 
     with open('topology.gns3') as f:
@@ -18,10 +23,11 @@ class Gns3:
     for node in json_output['topology']['nodes']:
             if node['name'] == device:
                 node_id = node['node_id']
+                print "starting ",device
     response = requests.request("POST",url+"/nodes/"+node_id+"/start")
  def stop(self,device):
 
-    url = "http://192.168.56.1:3080/v2/projects/"
+    url = self.gns3_host+ "v2/projects/"
     headers = {"Accept":"application/json","Content-Type":"application/json"}
 
     with open('topology.gns3') as f:
@@ -31,7 +37,7 @@ class Gns3:
     for node in json_output['topology']['nodes']:
            if node['name'] == device:
                 node_id = node['node_id']
-
+                print "stopping ", device
     response = requests.request("POST",url+"/nodes/"+node_id+"/stop")
 
 
@@ -40,11 +46,18 @@ class Gns3:
     with open('topology.gns3') as f:
         json_output = json.loads(f.read())
         project_id = json_output["project_id"]
+
     for node in json_output['topology']['nodes']:
           threads.append(threading.Thread(target=self.stop,args=(node['name'],)))
 
     for t in threads:
          t.start()
+
+    
+    for t in threads:
+         t.join()
+
+
  def start_all(self):
     threads =  []
     with open('topology.gns3') as f:

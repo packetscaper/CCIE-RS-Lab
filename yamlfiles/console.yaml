@@ -1,6 +1,8 @@
 ---
 
- gnsip : 192.168.66.128
+ gns3_vmware_ip : 192.168.66.128
+
+ gns3_host_ip : 192.168.56.1 
 
  routermapping :
 
