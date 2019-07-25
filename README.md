@@ -5,6 +5,39 @@
 A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment.
 
 
+## Topology
+
+### GNS3 physical topology
+
+[alt text](https://https://github.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/gns3_physical_topology.png)
+
+### Logical Topology
+
+[alt text](https://https://github.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/ip_addressing.png)
+
+
+
+### OSPF Topology
+
+
+[alt text](https://https://github.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/OSPF.png)
+
+
+
+### BGP Topology
+
+
+[alt text](https://https://github.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/BGP.png)
+
+
+More details follow the below workbooks <br>
+
+https://ine.com/products/ccie-routing-switching-workbook
+
+
+
+
+
 ## Setup
 
 1. Install GNS3 in a Windows machine - https://www.gns3.com/software/download
