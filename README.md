@@ -9,25 +9,25 @@ A utility to help practice and study for CCIE-RS-Lab in a GNS3 environment.
 
 ### GNS3 physical topology
 
-![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/gns3_physical_topology.png)
+![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/topologies/gns3_physical_topology.png)
 
 ### Logical Topology
 
-![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/ip_addressing.png)
+![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/topologies/ip_addressing.png)
 
 
 
 ### OSPF Topology
 
 
-![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/OSPF.png)
+![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/topologies/OSPF.png)
 
 
 
 ### BGP Topology
 
 
-![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/tree/master/topologies/BGP.png)
+![alt text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/topologies/BGP.png)
 
 
 More details follow the below workbooks <br>
