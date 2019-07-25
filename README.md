@@ -42,15 +42,22 @@ https://ine.com/products/ccie-routing-switching-workbook
 
 1. Install GNS3 in a Windows machine - https://www.gns3.com/software/download
 2. Install GNS3 VM in an ESXI - https://docs.gns3.com/1hEoK0rmtdBRnMaUaVoMHUbYwtDAltXYShiMJUp1GMxk/index.html
-2. Download topology.gns3 file and open it in GNS3.
-3. Issue git pull https://github.com/packetscaper/CCIE-RS-Lab.git in a linux machine
-4. Initialize yamlfilefiles/console.yaml based on your environment.
-5. Copy INE R&S v5 labs in the config folder.
-5. Install Netmiko
+3. Download topology.gns3 file and open it in GNS3.
+4. Issue git pull https://github.com/packetscaper/CCIE-RS-Lab.git in a linux machine
+5. Initialize yamlfilefiles/console.yaml based on your environment.
+6. Copy INE R&S v5 labs in the config folder.
+7. Install Netmiko
       ```
       pip install netmiko
       
       ```
+ 
+ For more details on setting up GNS3, the below links can be referred <br>
+ 
+ https://davidbombal.com/gns3-download-install-getting-working/ <br>
+ 
+ https://docs.gns3.com/1wdfvS-OlFfOf7HWZoSXMbG58C4pMSy7vKJFiKKVResc/index.html
+ 
  
 ## Usage
 
