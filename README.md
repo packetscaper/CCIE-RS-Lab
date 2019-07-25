@@ -86,4 +86,4 @@ Eg.
    
   ```
 
-![alt text](https://github.com/packetscaper/CCIE-RS-Lab/blob/master/topology.gns3)
+
