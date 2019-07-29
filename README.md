@@ -51,7 +51,7 @@ https://ine.com/products/ccie-routing-switching-workbook
    i.   gns3_vmware_ip is the ip over which the GNS3 VM can be accessed <br>
    ii.  gns3_host_ip is the ip over which gns3 utility runs. Generally a windows machine <br>
    iii. map the ports of the various routers as seen on your gns3 environment after opening the topology.gns3 <br>
-6  Download topology.gns3 file and open it in GNS3.
+6.  Download topology.gns3 file and open it in GNS3.
 7. Copy INE R&S v5 labs in the config folder.
 8. Install Netmiko python library
       ```
