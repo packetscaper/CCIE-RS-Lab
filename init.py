@@ -6,12 +6,14 @@ import threading
 from eigrp import *
 from ospf import *
 from gns3 import *
+from bgp import *
 import requests,json,time,os
+
 e = Eigrp()
 l = LabConnection()
 o = Ospf()
 g = Gns3()
-
+b = BGP()
 
 def start(device):
    g.start(device)
@@ -147,4 +149,10 @@ def lslab(lab=None):
    os.system(command)
 
 
+def init_bgp():
+  b.init_bgp()
 
+
+def bgp_topo():
+  b.bgp_topo()
+  

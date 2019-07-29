@@ -13,7 +13,7 @@ class BGP :
     l = LabConnection() 
     with open('yamlfiles/'+'console.yaml') as f:
         o = yaml.safe_load(f)
-        print "Configuring EIGRP on all routers"
+        print "Configuring BGP on all routers"
         for router in o["routermapping"]:
             commands = l.render('bgp_init.j2',router+'.yaml')
             threads.append(threading.Thread(target=l.push,args=(o["gns3_vmware_ip"],o["routermapping"][router],commands,router)))
@@ -24,14 +24,14 @@ class BGP :
     for t in threads:
          t.join()
 
-  def remove_eigrp(self):
+  def remove_bgp(self):
        threads = []
        l = LabConnection()
-       print "Removing EIGRP from all routers"
+       print "Removing bgp from all routers"
        with open('yamlfiles/' + 'console.yaml') as f:
          o = yaml.safe_load(f)
          for router in o["routermapping"]:
-            commands = ['no router eigrp 100'] 
+            commands = ['no router bgp'] 
             threads.append(threading.Thread(target=l.push,args=(o["gns3_vmware_ip"],o["routermapping"][router],commands)))
 
 
@@ -42,7 +42,7 @@ class BGP :
        for t in threads:
          t.join()
        
-       print "Removed EIGRP from all routers"
+       print "Removed bgp from all routers"
 
   def bgp_topo(self):
 
@@ -52,22 +52,26 @@ class BGP :
        print "Origin >  MED > Neighbor Type >  IGP metric \n \n\n\n" 
 
        print "             Topology \n \n"
-       print "         R6-------------ibgp-------------R4   "
-       print "         |   AS 100      |                |   "
-       print "         |               |                |   "
-       print "         |              R1                |   "
-       print "         |               |                |   "
-       print "         |               |                |   " 
-       print "         |               |                |   " 
-       print "         |   R2---------R3---------------R5   "
-       print "       ebgp             AS 200            |   "
-       print "         |                                |   "
-       print "         |                               R8   "
-       print "         |                                |   "
-       print "         |                              ebgp  "
-       print "         |                                |   " 
-       print "AS 300   R7------ebgp-----R9------------R10   "
-       print "                                 AS 54"       
+       print "         R6(100)------------ibgp--------------------R4(100)   "
+       print "         |                   |                       |   "
+       print "         |                   |                       |   "
+       print "         |                  R1(RR,100)               |   "
+       print "         |                   |                       |   "
+       print "         |                   |                       |   " 
+       print "         |                   |                       |   " 
+       print "         |   R2(200)---------R3(RR,200)-------------R5(RR,200)   "
+       print "       ebgp                                          |   "
+       print "         |                                           |   "
+       print "         |                                          R8(200)   "
+       print "         |                                           |   "
+       print "         |                                         ebgp  "
+       print "         |                                           |   " 
+       print "        R7(300)------ebgp-----R9(54)----ibgp--------R10(54)   "
+       print "  \n \n                 "
+       print "  AS 100    ==>   R1 --ebgp--R3      R6 ---bgp--R7      R4---ebgp---R5"
+       print "  AS 200    ==>   R2---ebgp---R10    R3---ebgp --R1     R3---ebgp----R7    R5---ebgp---R4    R8----ebgp---R10" 
+       print "  AS 300    ==>   R7---ebgp---R6     R7--ebgp---R6      R7---ebgp----R9 "
+       print "  AS 54     ==>   R9---ebgp---R7     R10---ebgp---R8    R10----ebgp---R2"
 
 
     #def basic_routing():
