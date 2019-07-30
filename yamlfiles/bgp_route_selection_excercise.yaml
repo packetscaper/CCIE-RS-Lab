@@ -1,0 +1,98 @@
+---
+
+ R7:
+  
+  weight_from_r3: 
+        
+      - ip as-path access-list 1 permit _54$
+      - route-map from_r3 permit 10
+      - match as-path 1
+      - set weight 1000
+      - route-map from_r3 permit 100
+      - router bgp 300
+      - neighbor 155.1.37.3 route-map from_r3 in
+      - do clear ip bgp * soft
+
+
+  no_weight_from_r3 :    
+      
+      - router bgp 300
+      - no neighbor 155.1.37.3 route-map from_r3 in
+      - no ip as-path access-list 1 permit _54$
+      - no route-map from_r3 permit 10
+      - no route-map from_r3 permit 100
+      - do clear ip bgp * soft
+
+
+
+ R6:
+  
+  local_preference_from_r7:
+
+      - ip as-path access-list 1 permit _54$
+      - route-map from_r7 permit 10
+      - match as-path 1
+      - set local-preference 200
+      - route-map from_r7 permit 100
+      - router bgp 100
+      - neighbor 155.1.67.7 route-map from_r7 in 
+
+  no_local_preference_from_r7:
+      - router bgp 100
+      - no neighbor 155.1.67.7 route-map from_r7 in 
+      - no ip as-path access-list 1 permit _54$
+      - no route-map from_r7 permit 10
+      - no route-map from_r7 permit 100
+      - do clear ip bgp * soft
+
+
+ R3 :
+
+  as_prepend_to_r1:
+
+      - ip as-path access-list 1 permit _54$
+      - route-map to_r1 permit 10
+      - match as-path 1
+      - set as-path prepend 200 200 200
+      - route-map to_r1 permit 100
+      - router bgp 200
+      - neighbor 155.1.13.1 route-map to_r1 in 
+
+
+  no_as_prepend_to_r1:
+
+      - router bgp 200
+      - no neighbor 155.1.13.1 route-map to_r1 out 
+      - no ip as-path access-list 1 permit _54$
+      - no route-map to_r1 permit 10
+      - no route-map to_r1 permit 100
+      - do clear ip bgp * soft
+
+
+ R5 :
+
+  as_prepend_to_r4:
+
+      - ip as-path access-list 1 permit _54$
+      - route-map to_r4 permit 10
+      - match as-path 1
+      - set as-path prepend 200 200 200
+      - route-map to_r4 permit 100
+      - router bgp 200
+      - neighbor 155.1.45.4 route-map from_r7 in 
+
+
+  no_as_prepend_to_r4:
+
+      - router bgp 200
+      - no neighbor 155.1.45.4 route-map to_r4 in 
+      - no ip as-path access-list 1 permit _54$
+      - no route-map to_r4 permit 10
+      - no route-map to_r4 permit 100
+      - do clear ip bgp * soft
+
+
+
+
+
+ 

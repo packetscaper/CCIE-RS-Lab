@@ -32,7 +32,7 @@ def start_all():
 def reset_lab():
     g.stop_all()
     g.start_all()
-    g.time.sleep(4)
+    time.sleep(4)
 
 def init_L2_switch():
     l = LabConnection()
@@ -155,4 +155,10 @@ def init_bgp():
 
 def bgp_topo():
   b.bgp_topo()
-  
+
+
+def bgp_path_selection(): 
+  b.best_path_selection_weight()
+  print "\n \n \n \n"
+  b.best_path_selection_local_preference()
+
