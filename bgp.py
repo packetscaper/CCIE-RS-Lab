@@ -137,7 +137,7 @@ class BGP :
       print "==================================================================================================="
       print "==================================AS_Prepend_Example=========================================" 
       l.output(['R1','R6','R4'],'show ip bgp 150.1.9.9')
-      print "R6 prefers R7 \n R1 prefers R3 \n R4 prefers R5 \n Neighbor Type ebgp over ibgp  \n"
+      print "R6 prefers R7 \nR1 prefers R3 \nR4 prefers R5 \nNeighbor Type ebgp over ibgp  \n"
       print "Configure AS 200 such that traffic from AS 100 towards AS 54 should exit via R7 AS 300 "
       commands = o["R3"]["as_prepend_to_r1"]
       l.output('R3',commands)

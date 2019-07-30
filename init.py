@@ -158,7 +158,15 @@ def bgp_topo():
 
 
 def bgp_path_selection(): 
-  b.best_path_selection_weight()
+  b.bgp_topo()
   print "\n \n \n \n"
-  b.best_path_selection_local_preference()
+  print "Choose from below for examples"
+  print " 1 - Weight \n 2 - Local_Preference \n 3 - AS_Prepend"
+  input = raw_input()
+  if input == '1':
+      b.best_path_selection_weight()
+  elif input == '2':
+      b.best_path_selection_local_preference()
+  elif input == '3':
+      b.best_path_selection_as_prepend()
 
