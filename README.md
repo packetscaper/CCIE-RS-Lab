@@ -85,7 +85,7 @@ Eg.
    : stop('R3')
   
   ```
-
+![alt-text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/gifs/init_lab.gif)
 ### Send and verify commands
 
 Eg. 
@@ -118,7 +118,7 @@ Eg.
    :reset_lab()
    
   ```
-
+![alt-text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/gifs/ospf.gif)
 ### Load INE labs
 
 Eg.
@@ -133,4 +133,4 @@ Eg.
    
   ```
 
-
+![alt-text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/gifs/load.gif)
