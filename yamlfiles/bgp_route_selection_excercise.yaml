@@ -175,6 +175,33 @@
 
 
 
+ equal_cost_load_balancing:
+
+   R5:
+    - router bgp 200
+    - maximum-path 4
+    - bgp dmzlink-bw
+    - neighbor 155.1.0.1 remote-as 100
+    - neighbor 155.1.0.1 dmzlink-bw
+    - neighbor 155.1.45.4 dmzlink-bw
+    - interface Tunnel 0
+    - bandwidth 50000
+
+   R4:
+    - router bgp 100
+    - network 150.1.4.4 mask 255.255.255.255
+   
+   R1:
+    - router bgp 100
+    - neighbor 155.1.0.5 remote-as 200
+    - network 150.1.1.1 mask 255.255.255.255
+
+   R6:
+    - router bgp 100
+    - network 150.1.6.6 mask 255.255.255.255
+
+
+
 
 
 

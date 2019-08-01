@@ -192,16 +192,17 @@ class BGP :
       with open('yamlfiles/bgp_route_selection_excercise.yaml') as f:
            o = yaml.safe_load(f)
       print "==================================================================================================="
-      print "==================================AS_Origin_Code_Example=========================================" 
+      print "==================================Med_Example=========================================" 
       l.output(['R1','R6','R4'],'show ip bgp 150.1.9.9')
       print "R6 prefers R7 \nR1 prefers R3 \nR4 prefers R5 \nNeighbor Type ebgp over ibgp  \n"
-      print "Configure AS 200 using Origin Code such that traffic from AS 100 towards AS 54 should exit via link b/w R4 and R5 AS 300 "
+      print "Configure AS 200 using Med such that traffic from AS 100 towards AS 54 should exit via link b/w R4 and R5 AS 300 "
       commands = o["R3"]["med_to_r1"]
       l.output('R3',commands)
       commands = o["R5"]["med_to_r4"]
       l.output('R5',commands)
       l.output(['R1','R6','R4'],'clear ip bgp * soft')
       time.sleep(2)
+      print "MED is only compared by default for routes received from the same AS"
       l.output(['R1','R6','R4'],'show ip bgp 150.1.9.9')
       print "Reverting configuration"
       commands = o["R3"]["no_med_to_r1"]
@@ -212,7 +213,7 @@ class BGP :
       time.sleep(2)
       l.output(['R1','R6','R4'],'show ip bgp 150.1.9.9')
       print "================================================================================================="
-      print "===========================================AS_Prepend_Example=============================="
+      print "===========================================Med_Example=============================="
   
 
     #def basic_routing():
