@@ -46,7 +46,7 @@ https://ine.com/products/ccie-routing-switching-workbook
 2. Install GNS3 VM in an ESXI - https://docs.gns3.com/1hEoK0rmtdBRnMaUaVoMHUbYwtDAltXYShiMJUp1GMxk/index.html
 3. Install this utility in a linux or mac machine using git pull https://github.com/packetscaper/CCIE-RS-Lab.git 
 4. Validate that there is connectivity between the linux or mac machine running this utility to the host running GNS3 as well as the GNS3 VM
-4. Download the topology.gns3 file and open it in GNS3.
+4. Download the topology.gns3 file and open it in GNS3. If this does't work then rebuild the lab in gns3, save the topology as topology.gns3 and replace this topology.gns3
 5. Initialize yamlfilefiles/console.yaml based on your environment <br>
    i.   gns3_vmware_ip is the ip over which the GNS3 VM can be accessed <br>
    ii.  gns3_host_ip is the ip over which gns3 utility runs. Generally a windows machine <br>
