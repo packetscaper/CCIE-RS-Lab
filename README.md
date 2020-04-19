@@ -134,3 +134,11 @@ Eg.
   ```
 
 ![alt-text](https://raw.githubusercontent.com/packetscaper/CCIE-RS-Lab/master/gifs/load.gif)
+
+### Help
+  ```
+   :help() # displays all the features
+   
+   
+   
+  ```
