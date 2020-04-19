@@ -2,8 +2,8 @@ from netmiko import ConnectHandler
 from jinja2 import Environment,FileSystemLoader
 import yaml
 import threading
-
-
+import os
+import time
 class LabConnection:
 
 
@@ -21,17 +21,17 @@ class LabConnection:
    netconnect = ConnectHandler(**cisco)
    if type(commands) == list:
      output = netconnect.send_config_set(commands)
-     print "Pushing commands to ", device, "\n"
-     print "-------------"+device+"----------------"+device+"----------------"+"--------------"+device+"--------"
-     print output 
-     print "-------------"+device+"----------------"+device+"----------------"+"--------------"+device+"--------"
+     print("Pushing commands to ", device, "\n")
+     print("-------------"+device+"----------------"+device+"----------------"+"--------------"+device+"--------")
+     print(output)
+     print("-------------"+device+"----------------"+device+"----------------"+"--------------"+device+"--------")
 
    if type(commands) == str:
     host = netconnect.find_prompt()
     output =   host +  commands + '\n' +  netconnect.send_command(commands) + '\n' + '\n' + '\n'
     border1= '------------'+host+'---------'+host+'-----------------' + host+ '---------------'+host+'---------------------------' + '\n' + '\n' + '\n'
     border2= '------------'+host+'---------'+host+'-----------------' + host+ '---------------'+host+'---------------------------' + '\n' + '\n' + '\n' 
-    print '\n' + '\n' + '\n' + border1 + output + border2
+    print('\n' + '\n' + '\n' + border1 + output + border2)
       
   def output(self,routers,commands):
      threads = []
@@ -61,5 +61,17 @@ class LabConnection:
         output = template.render(configuration)
     return str(output).splitlines()
 
-
-
+  def con(self,device):
+      with open('yamlfiles/'+ 'console.yaml') as f:
+          o = yaml.safe_load(f)
+      try : 
+       while(1):
+          if "R" not in device :
+              os.system('telnet ' + str(o["gns3_vmware_ip"]) + " "+ str(o["switchmapping"][device]))
+          else : 
+              os.system('telnet ' + str(o["gns3_vmware_ip"]) + " "+ str(o["routermapping"][device]))
+          print("Enter Ctrl + C within 5 seconds to exit before reconnection ")
+          time.sleep(5)
+           
+      except: 
+           print(" \n \n Exiting Console")
